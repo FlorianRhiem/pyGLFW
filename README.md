@@ -3,6 +3,7 @@ pyGLFW
 
 This module provides Python bindings for [GLFW](http://www.glfw.org/) (on GitHub: [glfw/glfw](http://github.com/glfw/glfw)). It is a `ctypes` wrapper which keeps very close to the original GLFW API, except for:
 
+ - function names use the pythonic `words_with_underscores` notation instead of `camelCase`
  - `GLFW_` and `glfw` prefixes have been removed, as their function is replaced by the module namespace
  - structs have been replaced with Python sequences
  - functions like `glfwGetMonitors` return a list instead of a pointer and an object count
