@@ -524,11 +524,13 @@ def set_error_callback(cbfun):
     '''
     global _error_callback
     previous_callback = _error_callback
+    if cbfun is None:
+        cbfun = 0
     c_cbfun = _GLFWerrorfun(cbfun)
     _error_callback = (cbfun, c_cbfun)
     cbfun = c_cbfun
     _glfw.glfwSetErrorCallback(cbfun)
-    if previous_callback is not None:
+    if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
 _glfw.glfwGetMonitors.restype = ctypes.POINTER(ctypes.POINTER(_GLFWmonitor))
@@ -616,11 +618,13 @@ def set_monitor_callback(cbfun):
     '''
     global _monitor_callback
     previous_callback = _monitor_callback
+    if cbfun is None:
+        cbfun = 0
     c_cbfun = _GLFWmonitorfun(cbfun)
     _monitor_callback = (cbfun, c_cbfun)
     cbfun = c_cbfun
     _glfw.glfwSetMonitorCallback(cbfun)
-    if previous_callback is not None:
+    if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
 _glfw.glfwGetVideoModes.restype = ctypes.POINTER(_GLFWvidmode)
@@ -965,11 +969,13 @@ def set_window_pos_callback(window, cbfun):
         previous_callback = _window_pos_callback_repository[window_addr]
     else:
         previous_callback = None
+    if cbfun is None:
+        cbfun = 0
     c_cbfun = _GLFWwindowposfun(cbfun)
     _window_pos_callback_repository[window_addr] = (cbfun, c_cbfun)
     cbfun = c_cbfun
     _glfw.glfwSetWindowPosCallback(window, cbfun)
-    if previous_callback is not None:
+    if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
 _window_size_callback_repository = {}
@@ -990,11 +996,13 @@ def set_window_size_callback(window, cbfun):
         previous_callback = _window_size_callback_repository[window_addr]
     else:
         previous_callback = None
+    if cbfun is None:
+        cbfun = 0
     c_cbfun = _GLFWwindowsizefun(cbfun)
     _window_size_callback_repository[window_addr] = (cbfun, c_cbfun)
     cbfun = c_cbfun
     _glfw.glfwSetWindowSizeCallback(window, cbfun)
-    if previous_callback is not None:
+    if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
 _window_close_callback_repository = {}
@@ -1015,11 +1023,13 @@ def set_window_close_callback(window, cbfun):
         previous_callback = _window_close_callback_repository[window_addr]
     else:
         previous_callback = None
+    if cbfun is None:
+        cbfun = 0
     c_cbfun = _GLFWwindowclosefun(cbfun)
     _window_close_callback_repository[window_addr] = (cbfun, c_cbfun)
     cbfun = c_cbfun
     _glfw.glfwSetWindowCloseCallback(window, cbfun)
-    if previous_callback is not None:
+    if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
 _window_refresh_callback_repository = {}
@@ -1040,11 +1050,13 @@ def set_window_refresh_callback(window, cbfun):
         previous_callback = _window_refresh_callback_repository[window_addr]
     else:
         previous_callback = None
+    if cbfun is None:
+        cbfun = 0
     c_cbfun = _GLFWwindowrefreshfun(cbfun)
     _window_refresh_callback_repository[window_addr] = (cbfun, c_cbfun)
     cbfun = c_cbfun
     _glfw.glfwSetWindowRefreshCallback(window, cbfun)
-    if previous_callback is not None:
+    if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
 _window_focus_callback_repository = {}
@@ -1065,11 +1077,13 @@ def set_window_focus_callback(window, cbfun):
         previous_callback = _window_focus_callback_repository[window_addr]
     else:
         previous_callback = None
+    if cbfun is None:
+        cbfun = 0
     c_cbfun = _GLFWwindowfocusfun(cbfun)
     _window_focus_callback_repository[window_addr] = (cbfun, c_cbfun)
     cbfun = c_cbfun
     _glfw.glfwSetWindowFocusCallback(window, cbfun)
-    if previous_callback is not None:
+    if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
 _window_iconify_callback_repository = {}
@@ -1090,11 +1104,13 @@ def set_window_iconify_callback(window, cbfun):
         previous_callback = _window_iconify_callback_repository[window_addr]
     else:
         previous_callback = None
+    if cbfun is None:
+        cbfun = 0
     c_cbfun = _GLFWwindowiconifyfun(cbfun)
     _window_iconify_callback_repository[window_addr] = (cbfun, c_cbfun)
     cbfun = c_cbfun
     _glfw.glfwSetWindowIconifyCallback(window, cbfun)
-    if previous_callback is not None:
+    if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
 _framebuffer_size_callback_repository = {}
@@ -1115,11 +1131,13 @@ def set_framebuffer_size_callback(window, cbfun):
         previous_callback = _framebuffer_size_callback_repository[window_addr]
     else:
         previous_callback = None
+    if cbfun is None:
+        cbfun = 0
     c_cbfun = _GLFWframebuffersizefun(cbfun)
     _framebuffer_size_callback_repository[window_addr] = (cbfun, c_cbfun)
     cbfun = c_cbfun
     _glfw.glfwSetFramebufferSizeCallback(window, cbfun)
-    if previous_callback is not None:
+    if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
 _glfw.glfwPollEvents.restype = None
@@ -1249,11 +1267,13 @@ def set_key_callback(window, cbfun):
         previous_callback = _key_callback_repository[window_addr]
     else:
         previous_callback = None
+    if cbfun is None:
+        cbfun = 0
     c_cbfun = _GLFWkeyfun(cbfun)
     _key_callback_repository[window_addr] = (cbfun, c_cbfun)
     cbfun = c_cbfun
     _glfw.glfwSetKeyCallback(window, cbfun)
-    if previous_callback is not None:
+    if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
 _char_callback_repository = {}
@@ -1274,11 +1294,13 @@ def set_char_callback(window, cbfun):
         previous_callback = _char_callback_repository[window_addr]
     else:
         previous_callback = None
+    if cbfun is None:
+        cbfun = 0
     c_cbfun = _GLFWcharfun(cbfun)
     _char_callback_repository[window_addr] = (cbfun, c_cbfun)
     cbfun = c_cbfun
     _glfw.glfwSetCharCallback(window, cbfun)
-    if previous_callback is not None:
+    if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
 _mouse_button_callback_repository = {}
@@ -1299,11 +1321,13 @@ def set_mouse_button_callback(window, cbfun):
         previous_callback = _mouse_button_callback_repository[window_addr]
     else:
         previous_callback = None
+    if cbfun is None:
+        cbfun = 0
     c_cbfun = _GLFWmousebuttonfun(cbfun)
     _mouse_button_callback_repository[window_addr] = (cbfun, c_cbfun)
     cbfun = c_cbfun
     _glfw.glfwSetMouseButtonCallback(window, cbfun)
-    if previous_callback is not None:
+    if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
 _cursor_pos_callback_repository = {}
@@ -1324,11 +1348,13 @@ def set_cursor_pos_callback(window, cbfun):
         previous_callback = _cursor_pos_callback_repository[window_addr]
     else:
         previous_callback = None
+    if cbfun is None:
+        cbfun = 0
     c_cbfun = _GLFWcursorposfun(cbfun)
     _cursor_pos_callback_repository[window_addr] = (cbfun, c_cbfun)
     cbfun = c_cbfun
     _glfw.glfwSetCursorPosCallback(window, cbfun)
-    if previous_callback is not None:
+    if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
 _cursor_enter_callback_repository = {}
@@ -1349,11 +1375,13 @@ def set_cursor_enter_callback(window, cbfun):
         previous_callback = _cursor_enter_callback_repository[window_addr]
     else:
         previous_callback = None
+    if cbfun is None:
+        cbfun = 0
     c_cbfun = _GLFWcursorenterfun(cbfun)
     _cursor_enter_callback_repository[window_addr] = (cbfun, c_cbfun)
     cbfun = c_cbfun
     _glfw.glfwSetCursorEnterCallback(window, cbfun)
-    if previous_callback is not None:
+    if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
 _scroll_callback_repository = {}
@@ -1374,11 +1402,13 @@ def set_scroll_callback(window, cbfun):
         previous_callback = _scroll_callback_repository[window_addr]
     else:
         previous_callback = None
+    if cbfun is None:
+        cbfun = 0
     c_cbfun = _GLFWscrollfun(cbfun)
     _scroll_callback_repository[window_addr] = (cbfun, c_cbfun)
     cbfun = c_cbfun
     _glfw.glfwSetScrollCallback(window, cbfun)
-    if previous_callback is not None:
+    if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
 _glfw.glfwJoystickPresent.restype = ctypes.c_int
