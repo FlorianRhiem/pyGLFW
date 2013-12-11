@@ -499,7 +499,7 @@ def get_version():
     rev_value = ctypes.c_int(0)
     rev = ctypes.pointer(rev_value)
     _glfw.glfwGetVersion(major, minor, rev)
-    return major_value, minor_value, rev_value
+    return major_value.value, minor_value.value, rev_value.value
 
 _glfw.glfwGetVersionString.restype = ctypes.c_char_p
 _glfw.glfwGetVersionString.argtypes = []
@@ -575,7 +575,7 @@ def get_monitor_pos(monitor):
     ypos_value = ctypes.c_int(0)
     ypos = ctypes.pointer(ypos_value)
     _glfw.glfwGetMonitorPos(monitor, xpos, ypos)
-    return xpos_value, ypos_value
+    return xpos_value.value, ypos_value.value
 
 _glfw.glfwGetMonitorPhysicalSize.restype = None
 _glfw.glfwGetMonitorPhysicalSize.argtypes = [ctypes.POINTER(_GLFWmonitor),
@@ -593,7 +593,7 @@ def get_monitor_physical_size(monitor):
     height_value = ctypes.c_int(0)
     height = ctypes.pointer(height_value)
     _glfw.glfwGetMonitorPhysicalSize(monitor, width, height)
-    return width_value, height_value
+    return width_value.value, height_value.value
 
 _glfw.glfwGetMonitorName.restype = ctypes.c_char_p
 _glfw.glfwGetMonitorName.argtypes = [ctypes.POINTER(_GLFWmonitor)]
@@ -797,7 +797,7 @@ def get_window_pos(window):
     ypos_value = ctypes.c_int(0)
     ypos = ctypes.pointer(ypos_value)
     _glfw.glfwGetWindowPos(window, xpos, ypos)
-    return xpos_value, ypos_value
+    return xpos_value.value, ypos_value.value
 
 _glfw.glfwSetWindowPos.restype = None
 _glfw.glfwSetWindowPos.argtypes = [ctypes.POINTER(_GLFWwindow),
@@ -828,7 +828,7 @@ def get_window_size(window):
     height_value = ctypes.c_int(0)
     height = ctypes.pointer(height_value)
     _glfw.glfwGetWindowSize(window, width, height)
-    return width_value, height_value
+    return width_value.value, height_value.value
 
 _glfw.glfwSetWindowSize.restype = None
 _glfw.glfwSetWindowSize.argtypes = [ctypes.POINTER(_GLFWwindow),
@@ -859,7 +859,7 @@ def get_framebuffer_size(window):
     height_value = ctypes.c_int(0)
     height = ctypes.pointer(height_value)
     _glfw.glfwGetFramebufferSize(window, width, height)
-    return width_value, height_value
+    return width_value.value, height_value.value
 
 _glfw.glfwIconifyWindow.restype = None
 _glfw.glfwIconifyWindow.argtypes = [ctypes.POINTER(_GLFWwindow)]
@@ -1234,7 +1234,7 @@ def get_cursor_pos(window):
     ypos_value = ctypes.c_double(0.0)
     ypos = ctypes.pointer(ypos_value)
     _glfw.glfwGetCursorPos(window, xpos, ypos)
-    return xpos_value, ypos_value
+    return xpos_value.value, ypos_value.value
 
 _glfw.glfwSetCursorPos.restype = None
 _glfw.glfwSetCursorPos.argtypes = [ctypes.POINTER(_GLFWwindow),
@@ -1435,7 +1435,7 @@ def get_joystick_axes(joy):
     count_value = ctypes.c_int(0)
     count = ctypes.pointer(count_value)
     result = _glfw.glfwGetJoystickAxes(joy, count)
-    return result, count_value
+    return result, count_value.value
 
 _glfw.glfwGetJoystickButtons.restype = ctypes.POINTER(ctypes.c_ubyte)
 _glfw.glfwGetJoystickButtons.argtypes = [ctypes.c_int,
@@ -1450,7 +1450,7 @@ def get_joystick_buttons(joy):
     count_value = ctypes.c_int(0)
     count = ctypes.pointer(count_value)
     result = _glfw.glfwGetJoystickButtons(joy, count)
-    return result, count_value
+    return result, count_value.value
 
 _glfw.glfwGetJoystickName.restype = ctypes.c_char_p
 _glfw.glfwGetJoystickName.argtypes = [ctypes.c_int]
