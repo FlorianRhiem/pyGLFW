@@ -5,7 +5,7 @@ Python bindings for GLFW.
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
 __copyright__ = 'Copyright (c) 2013 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '3.0.3.0' # GLFW version . pyGLFW version
+__version__ = '3.0.3.2' # GLFW version . pyGLFW version
 
 import ctypes
 import os
@@ -27,14 +27,18 @@ def _find_library_candidates(library_names,
                     continue
                 basename = os.path.basename(filename)
                 if basename.startswith('lib'+library_name):
-                    basename_rest = basename[len('lib'+library_name):]
+                    basename_end = basename[len('lib'+library_name):]
                 elif basename.startswith(library_name):
-                    basename_rest = basename[len(library_name):]
+                    basename_end = basename[len(library_name):]
                 else:
                     continue
                 for file_extension in library_file_extensions:
-                    if basename_rest.startswith(file_extension):
-                        if basename_rest[len(file_extension):][:1] in ('', '.'):
+                    if basename_end.startswith(file_extension):
+                        if basename_end[len(file_extension):][:1] in ('', '.'):
+                            candidates.add(filename)
+                    if basename_end.endswith(file_extension):
+                        basename_middle = basename_end[:-len(file_extension)]
+                        if all(c in '0123456789.' for c in basename_middle):
                             candidates.add(filename)
     return candidates
 
@@ -64,7 +68,7 @@ def _load_library(library_names, library_file_extensions,
 
 def _glfw_get_version(library_handle):
     '''
-    Queries and returns the
+    Queries and returns the library version tuple or None.
     '''
     major_value = ctypes.c_int(0)
     major = ctypes.pointer(major_value)
