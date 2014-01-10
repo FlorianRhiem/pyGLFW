@@ -472,7 +472,10 @@ def init():
     Wrapper for:
         int glfwInit(void);
     '''
-    return _glfw.glfwInit()
+    cwd = os.getcwdu()
+    res = _glfw.glfwInit()
+    os.chdir(cwd)
+    return res
 
 _glfw.glfwTerminate.restype = None
 _glfw.glfwTerminate.argtypes = []
