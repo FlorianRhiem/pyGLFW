@@ -5,7 +5,7 @@ Python bindings for GLFW.
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
 __copyright__ = 'Copyright (c) 2013 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '3.0.3.2' # GLFW version . pyGLFW version
+__version__ = '3.0.3.3' # GLFW version . pyGLFW version
 
 import ctypes
 import os
@@ -58,7 +58,7 @@ def _load_library(library_names, library_file_extensions,
             pass
         else:
             version = version_check_callback(library_handle)
-            if version is not None:
+            if version is not None and version >= (3,0,0):
                 library_versions.append((version, library_handle))
 
     if not library_versions:
@@ -85,6 +85,9 @@ def _glfw_get_version(library_handle):
 
 _glfw = _load_library(['glfw', 'glfw3'], ['.so', '.dylib', '.dll'], 
                       ['', '/usr/lib', '/usr/local/lib'], _glfw_get_version)
+if _glfw is None:
+    raise ImportError("Failed to load GLFW3 shared library.")
+
 _callback_repositories = []
 
 
