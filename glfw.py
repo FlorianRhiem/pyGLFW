@@ -5,11 +5,13 @@ Python bindings for GLFW.
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
 __copyright__ = 'Copyright (c) 2013 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '3.0.3.3' # GLFW version . pyGLFW version
+__version__ = '3.0.3.4' # GLFW version . pyGLFW version
 
 import ctypes
 import os
 import glob
+import sys
+import subprocess
 
 def _find_library_candidates(library_names,
                              library_file_extensions, 
@@ -52,21 +54,24 @@ def _load_library(library_names, library_file_extensions,
                                           library_search_paths)
     library_versions = []
     for filename in candidates:
-        try:
-            library_handle = ctypes.CDLL(filename)
-        except OSError:
-            pass
-        else:
-            version = version_check_callback(library_handle)
-            if version is not None and version >= (3,0,0):
-                library_versions.append((version, library_handle))
+        version = version_check_callback(filename)
+        if version is not None and version >= (3, 0, 0):
+            library_versions.append((version, filename))
 
     if not library_versions:
         return None
     library_versions.sort()
-    return library_versions[-1][1]
+    return ctypes.CDLL(library_versions[-1][1])
 
-def _glfw_get_version(library_handle):
+def _glfw_get_version(filename):
+    '''
+    Queries and returns the library version tuple or None by using a subprocess.
+    '''
+    version_checker_source = """
+import sys
+import ctypes
+
+def get_version(library_handle):
     '''
     Queries and returns the library version tuple or None.
     '''
@@ -80,6 +85,30 @@ def _glfw_get_version(library_handle):
         library_handle.glfwGetVersion(major, minor, rev)
         version = (major_value.value, minor_value.value, rev_value.value)
         return version
+    else:
+        return None
+
+try:
+    input_func = raw_input
+except NameError:
+    input_func = input
+filename = input_func().strip()
+
+try:
+    library_handle = ctypes.CDLL(filename)
+except OSError:
+    pass
+else:
+    version = get_version(library_handle)
+    print(version)
+"""
+
+    args = [sys.executable, '-c', version_checker_source]
+    process = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    out = process.communicate(filename.encode())[0]
+    out = out.strip()
+    if out:
+        return eval(out)
     else:
         return None
 
