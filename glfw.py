@@ -12,6 +12,7 @@ import os
 import glob
 import sys
 import subprocess
+import textwrap
 
 def _find_library_candidates(library_names,
                              library_file_extensions, 
@@ -68,43 +69,44 @@ def _glfw_get_version(filename):
     Queries and returns the library version tuple or None by using a subprocess.
     '''
     version_checker_source = """
-import sys
-import ctypes
+        import sys
+        import ctypes
 
-def get_version(library_handle):
-    '''
-    Queries and returns the library version tuple or None.
-    '''
-    major_value = ctypes.c_int(0)
-    major = ctypes.pointer(major_value)
-    minor_value = ctypes.c_int(0)
-    minor = ctypes.pointer(minor_value)
-    rev_value = ctypes.c_int(0)
-    rev = ctypes.pointer(rev_value)
-    if hasattr(library_handle, 'glfwGetVersion'):
-        library_handle.glfwGetVersion(major, minor, rev)
-        version = (major_value.value, minor_value.value, rev_value.value)
-        return version
-    else:
-        return None
+        def get_version(library_handle):
+            '''
+            Queries and returns the library version tuple or None.
+            '''
+            major_value = ctypes.c_int(0)
+            major = ctypes.pointer(major_value)
+            minor_value = ctypes.c_int(0)
+            minor = ctypes.pointer(minor_value)
+            rev_value = ctypes.c_int(0)
+            rev = ctypes.pointer(rev_value)
+            if hasattr(library_handle, 'glfwGetVersion'):
+                library_handle.glfwGetVersion(major, minor, rev)
+                version = (major_value.value, minor_value.value, rev_value.value)
+                return version
+            else:
+                return None
 
-try:
-    input_func = raw_input
-except NameError:
-    input_func = input
-filename = input_func().strip()
+        try:
+            input_func = raw_input
+        except NameError:
+            input_func = input
+        filename = input_func().strip()
 
-try:
-    library_handle = ctypes.CDLL(filename)
-except OSError:
-    pass
-else:
-    version = get_version(library_handle)
-    print(version)
-"""
+        try:
+            library_handle = ctypes.CDLL(filename)
+        except OSError:
+            pass
+        else:
+            version = get_version(library_handle)
+            print(version)
+    """
 
-    args = [sys.executable, '-c', version_checker_source]
-    process = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    args = [sys.executable, '-c', textwrap.dedent(version_checker_source)]
+    process = subprocess.Popen(args, stdin=subprocess.PIPE,
+                               stdout=subprocess.PIPE)
     out = process.communicate(filename.encode())[0]
     out = out.strip()
     if out:
