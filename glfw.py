@@ -5,7 +5,7 @@ Python bindings for GLFW.
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
 __copyright__ = 'Copyright (c) 2013 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '3.0.3.4' # GLFW version . pyGLFW version
+__version__ = '3.0.3.5' # GLFW version . pyGLFW version
 
 import ctypes
 import os
@@ -105,9 +105,9 @@ def _glfw_get_version(filename):
     """
 
     args = [sys.executable, '-c', textwrap.dedent(version_checker_source)]
-    process = subprocess.Popen(args, stdin=subprocess.PIPE,
-                               stdout=subprocess.PIPE)
-    out = process.communicate(filename.encode())[0]
+    process = subprocess.Popen(args, universal_newlines=True,
+                               stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    out = process.communicate(filename)[0]
     out = out.strip()
     if out:
         return eval(out)
