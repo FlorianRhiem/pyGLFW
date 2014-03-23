@@ -2,10 +2,14 @@
 Python bindings for GLFW.
 '''
 
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
 __copyright__ = 'Copyright (c) 2013 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '3.0.3.5' # GLFW version . pyGLFW version
+__version__ = '1.0'
 
 import ctypes
 import os
@@ -14,8 +18,19 @@ import sys
 import subprocess
 import textwrap
 
+# Python 3 compatibility:
+try:
+    _getcwd = os.getcwdu
+except AttributeError:
+    _getcwd = os.getcwd
+if sys.version_info.major > 2:
+    _to_char_p = lambda s: s.encode('utf-8')
+else:
+    _to_char_p = lambda s: s
+
+
 def _find_library_candidates(library_names,
-                             library_file_extensions, 
+                             library_file_extensions,
                              library_search_paths):
     '''
     Finds and returns filenames which might be the library you are looking for.
@@ -45,13 +60,14 @@ def _find_library_candidates(library_names,
                             candidates.add(filename)
     return candidates
 
-def _load_library(library_names, library_file_extensions, 
+
+def _load_library(library_names, library_file_extensions,
                   library_search_paths, version_check_callback):
     '''
     Finds, loads and returns the most recent version of the library.
     '''
     candidates = _find_library_candidates(library_names,
-                                          library_file_extensions, 
+                                          library_file_extensions,
                                           library_search_paths)
     library_versions = []
     for filename in candidates:
@@ -64,9 +80,11 @@ def _load_library(library_names, library_file_extensions,
     library_versions.sort()
     return ctypes.CDLL(library_versions[-1][1])
 
+
 def _glfw_get_version(filename):
     '''
-    Queries and returns the library version tuple or None by using a subprocess.
+    Queries and returns the library version tuple or None by using a
+    subprocess.
     '''
     version_checker_source = """
         import sys
@@ -84,7 +102,9 @@ def _glfw_get_version(filename):
             rev = ctypes.pointer(rev_value)
             if hasattr(library_handle, 'glfwGetVersion'):
                 library_handle.glfwGetVersion(major, minor, rev)
-                version = (major_value.value, minor_value.value, rev_value.value)
+                version = (major_value.value,
+                           minor_value.value,
+                           rev_value.value)
                 return version
             else:
                 return None
@@ -114,7 +134,7 @@ def _glfw_get_version(filename):
     else:
         return None
 
-_glfw = _load_library(['glfw', 'glfw3'], ['.so', '.dylib', '.dll'], 
+_glfw = _load_library(['glfw', 'glfw3'], ['.so', '.dylib', '.dll'],
                       ['', '/usr/lib', '/usr/local/lib'], _glfw_get_version)
 if _glfw is None:
     raise ImportError("Failed to load GLFW3 shared library.")
@@ -185,7 +205,7 @@ class _GLFWgammaramp(ctypes.Structure):
                 ("green", ctypes.POINTER(ctypes.c_ushort)),
                 ("blue", ctypes.POINTER(ctypes.c_ushort)),
                 ("size", ctypes.c_uint)]
-    
+
     def __init__(self):
         ctypes.Structure.__init__(self)
         self.red = None
@@ -215,14 +235,14 @@ class _GLFWgammaramp(ctypes.Structure):
         self.red = ctypes.cast(self.red_array, pointer_type)
         self.green = ctypes.cast(self.green_array, pointer_type)
         self.blue = ctypes.cast(self.blue_array, pointer_type)
-        
+
     def unwrap(self):
         '''
         Returns a nested python sequence.
         '''
         red = [self.red[i]/65535.0 for i in range(self.size)]
         green = [self.green[i]/65535.0 for i in range(self.size)]
-        blue = [self.blue[i]/65535.0 for i in range(self.size)]        
+        blue = [self.blue[i]/65535.0 for i in range(self.size)]
         return red, green, blue
 
 
@@ -506,7 +526,7 @@ def init():
     Wrapper for:
         int glfwInit(void);
     '''
-    cwd = os.getcwdu()
+    cwd = _getcwd()
     res = _glfw.glfwInit()
     os.chdir(cwd)
     return res
@@ -770,7 +790,8 @@ def create_window(width, height, title, monitor, share):
     Wrapper for:
         GLFWwindow* glfwCreateWindow(int width, int height, const char* title, GLFWmonitor* monitor, GLFWwindow* share);
     '''
-    return _glfw.glfwCreateWindow(width, height, title, monitor, share)
+    return _glfw.glfwCreateWindow(width, height, _to_char_p(title),
+                                  monitor, share)
 
 _glfw.glfwDestroyWindow.restype = None
 _glfw.glfwDestroyWindow.argtypes = [ctypes.POINTER(_GLFWwindow)]
@@ -820,7 +841,7 @@ def set_window_title(window, title):
     Wrapper for:
         void glfwSetWindowTitle(GLFWwindow* window, const char* title);
     '''
-    _glfw.glfwSetWindowTitle(window, title)
+    _glfw.glfwSetWindowTitle(window, _to_char_p(title))
 
 _glfw.glfwGetWindowPos.restype = None
 _glfw.glfwGetWindowPos.argtypes = [ctypes.POINTER(_GLFWwindow),
@@ -1514,7 +1535,7 @@ def set_clipboard_string(window, string):
     Wrapper for:
         void glfwSetClipboardString(GLFWwindow* window, const char* string);
     '''
-    _glfw.glfwSetClipboardString(window, string)
+    _glfw.glfwSetClipboardString(window, _to_char_p(string))
 
 _glfw.glfwGetClipboardString.restype = ctypes.c_char_p
 _glfw.glfwGetClipboardString.argtypes = [ctypes.POINTER(_GLFWwindow)]
@@ -1603,7 +1624,7 @@ def extension_supported(extension):
     Wrapper for:
         int glfwExtensionSupported(const char* extension);
     '''
-    return _glfw.glfwExtensionSupported(extension)
+    return _glfw.glfwExtensionSupported(_to_char_p(extension))
 
 _glfw.glfwGetProcAddress.restype = ctypes.c_void_p
 _glfw.glfwGetProcAddress.argtypes = [ctypes.c_char_p]
@@ -1615,4 +1636,4 @@ def get_proc_address(procname):
     Wrapper for:
         GLFWglproc glfwGetProcAddress(const char* procname);
     '''
-    return _glfw.glfwGetProcAddress(procname)
+    return _glfw.glfwGetProcAddress(_to_char_p(procname))
