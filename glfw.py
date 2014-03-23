@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
 __copyright__ = 'Copyright (c) 2013 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '1.0'
+__version__ = '1.0.1'
 
 import ctypes
 import os
@@ -127,7 +127,7 @@ def _glfw_get_version(filename):
     args = [sys.executable, '-c', textwrap.dedent(version_checker_source)]
     process = subprocess.Popen(args, universal_newlines=True,
                                stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    out = process.communicate(filename)[0]
+    out = process.communicate(_to_char_p(filename))[0]
     out = out.strip()
     if out:
         return eval(out)
