@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
 __copyright__ = 'Copyright (c) 2013 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '1.0.2'
+__version__ = '1.1.0'
 
 import ctypes
 import os
@@ -541,6 +541,12 @@ def terminate():
     Wrapper for:
         void glfwTerminate(void);
     '''
+
+    for callback_repository in _callback_repositories:
+        for window_addr in callback_repository.keys()[:]:
+            del callback_repository[window_addr]
+    for window_addr in _window_user_data_repository.keys()[:]:
+        del _window_user_data_repository[window_addr]
     _glfw.glfwTerminate()
 
 _glfw.glfwGetVersion.restype = None
@@ -809,6 +815,8 @@ def destroy_window(window):
     for callback_repository in _callback_repositories:
         if window_addr in callback_repository:
             del callback_repository[window_addr]
+    if window_addr in _window_user_data_repository:
+        del _window_user_data_repository[window_addr]
 
 _glfw.glfwWindowShouldClose.restype = ctypes.c_int
 _glfw.glfwWindowShouldClose.argtypes = [ctypes.POINTER(_GLFWwindow)]
@@ -992,16 +1000,29 @@ def get_window_attrib(window, attrib):
     '''
     return _glfw.glfwGetWindowAttrib(window, attrib)
 
+_window_user_data_repository = {}
 _glfw.glfwSetWindowUserPointer.restype = None
 _glfw.glfwSetWindowUserPointer.argtypes = [ctypes.POINTER(_GLFWwindow),
                                            ctypes.c_void_p]
 def set_window_user_pointer(window, pointer):
     '''
-    Sets the user pointer of the specified window.
+    Sets the user pointer of the specified window. You may pass a normal python object into this function and it will
+    be wrapped automatically. The object will be kept in existence until the pointer is set to something else or
+    until the window is destroyed.
 
     Wrapper for:
         void glfwSetWindowUserPointer(GLFWwindow* window, void* pointer);
     '''
+
+    data = (False, pointer)
+    if not isinstance(pointer, ctypes.c_void_p):
+        data = (True, pointer)
+        # Create a void pointer for the python object
+        pointer = ctypes.cast(ctypes.pointer(ctypes.py_object(pointer)), ctypes.c_void_p)
+
+    window_addr = ctypes.cast(ctypes.pointer(window),
+                              ctypes.POINTER(ctypes.c_long)).contents.value
+    _window_user_data_repository[window_addr] = data
     _glfw.glfwSetWindowUserPointer(window, pointer)
 
 _glfw.glfwGetWindowUserPointer.restype = ctypes.c_void_p
@@ -1013,6 +1034,15 @@ def get_window_user_pointer(window):
     Wrapper for:
         void* glfwGetWindowUserPointer(GLFWwindow* window);
     '''
+
+    window_addr = ctypes.cast(ctypes.pointer(window),
+                              ctypes.POINTER(ctypes.c_long)).contents.value
+
+    if window_addr in _window_user_data_repository:
+        data = _window_user_data_repository[window_addr]
+        is_wrapped_py_object = data[0]
+        if is_wrapped_py_object:
+            return data[1]
     return _glfw.glfwGetWindowUserPointer(window)
 
 _window_pos_callback_repository = {}
