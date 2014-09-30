@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
 __copyright__ = 'Copyright (c) 2013 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 
 import ctypes
 import os
@@ -543,9 +543,9 @@ def terminate():
     '''
 
     for callback_repository in _callback_repositories:
-        for window_addr in callback_repository.keys()[:]:
+        for window_addr in list(callback_repository.keys()):
             del callback_repository[window_addr]
-    for window_addr in _window_user_data_repository.keys()[:]:
+    for window_addr in list(_window_user_data_repository.keys()):
         del _window_user_data_repository[window_addr]
     _glfw.glfwTerminate()
 
