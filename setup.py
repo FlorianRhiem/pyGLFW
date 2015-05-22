@@ -25,7 +25,7 @@ with open('README.txt') as file:
     long_description = file.read()
 
 setup(name='glfw',
-      version='1.1.1',
+      version='1.1.2',
       description='A ctypes-based wrapper for GLFW3.',
       long_description=long_description,
       author='Florian Rhiem',

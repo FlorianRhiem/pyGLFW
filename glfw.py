@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
 __copyright__ = 'Copyright (c) 2013 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '1.1.1'
+__version__ = '1.1.2'
 
 import ctypes
 import os
@@ -134,9 +134,17 @@ def _glfw_get_version(filename):
     else:
         return None
 
-_glfw = _load_library(['glfw', 'glfw3'], ['.so', '.dylib', '.dll'],
-                      ['', '/usr/lib', '/usr/local/lib', 
-                       '/usr/lib/x86_64-linux-gnu/'], _glfw_get_version)
+if sys.platform == 'win32':
+    # only try glfw3.dll on windows
+    try:
+        _glfw = ctypes.CDLL('glfw3.dll')
+    except OSError:
+        _glfw = None
+else:
+    _glfw = _load_library(['glfw', 'glfw3'], ['.so', '.dylib'],
+                          ['', '/usr/lib', '/usr/local/lib',
+                           '/usr/lib/x86_64-linux-gnu/'], _glfw_get_version)
+
 if _glfw is None:
     raise ImportError("Failed to load GLFW3 shared library.")
 
