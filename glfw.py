@@ -141,8 +141,15 @@ if sys.platform == 'win32':
     except OSError:
         _glfw = None
 else:
+    is_64bit = sys.maxsize > 2**32
+    library_dir_suffix = ''
+
+    if is_64bit:
+        library_dir_suffix = '64'
+
     _glfw = _load_library(['glfw', 'glfw3'], ['.so', '.dylib'],
-                          ['', '/usr/lib', '/usr/local/lib',
+                          ['', '/usr/lib' + library_dir_suffix,
+                           '/usr/local/lib' + library_dir_suffix,
                            '/usr/lib/x86_64-linux-gnu/'], _glfw_get_version)
 
 if _glfw is None:
