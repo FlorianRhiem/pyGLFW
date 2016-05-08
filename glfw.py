@@ -7,9 +7,9 @@ from __future__ import division
 from __future__ import unicode_literals
 
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
-__copyright__ = 'Copyright (c) 2013 Florian Rhiem'
+__copyright__ = 'Copyright (c) 2013-2016 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '1.1.2'
+__version__ = '1.1.3'
 
 import ctypes
 import os
@@ -141,15 +141,10 @@ if sys.platform == 'win32':
     except OSError:
         _glfw = None
 else:
-    is_64bit = sys.maxsize > 2**32
-    library_dir_suffix = ''
-
-    if is_64bit:
-        library_dir_suffix = '64'
-
     _glfw = _load_library(['glfw', 'glfw3'], ['.so', '.dylib'],
-                          ['', '/usr/lib' + library_dir_suffix,
-                           '/usr/local/lib' + library_dir_suffix,
+                          ['',
+                           '/usr/lib64', '/usr/local/lib64',
+                           '/usr/lib', '/usr/local/lib',
                            '/usr/lib/x86_64-linux-gnu/'], _glfw_get_version)
 
 if _glfw is None:
