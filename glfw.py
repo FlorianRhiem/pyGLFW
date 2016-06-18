@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
 __copyright__ = 'Copyright (c) 2013-2016 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '1.2.0'
+__version__ = '1.2.1'
 
 import ctypes
 import os
@@ -286,11 +286,12 @@ class _GLFWimage(ctypes.Structure):
         Wraps a nested python sequence.
         """
         self.width, self.height, pixels = image
-        array_type = ctypes.c_ubyte*self.width*self.height
+        array_type = ctypes.c_ubyte * 4 * self.width * self.height
         self.pixels_array = array_type()
         for i in range(self.height):
             for j in range(self.width):
-                self.pixels_array[i][j] = pixels[i][j]
+                for k in range(4):
+                    self.pixels_array[i][j][k] = pixels[i][j][k]
         pointer_type = ctypes.POINTER(ctypes.c_ubyte)
         self.pixels = ctypes.cast(self.pixels_array, pointer_type)
 
@@ -298,7 +299,7 @@ class _GLFWimage(ctypes.Structure):
         """
         Returns a nested python sequence.
         """
-        pixels = [[int(p) for p in l] for l in self.pixels_array]
+        pixels = [[[int(c) for c in p] for p in l] for l in self.pixels_array]
         return self.width, self.height, pixels
 
 
