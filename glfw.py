@@ -9,10 +9,16 @@ from __future__ import unicode_literals
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
 __copyright__ = 'Copyright (c) 2013-2016 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '1.2.1'
+__version__ = '1.3.0'
+
+# By default (ERROR_REPORTING = True), GLFW errors will be reported as Python
+# exceptions. Set ERROR_REPORTING to False or set a curstom error callback to
+# disable this behavior.
+ERROR_REPORTING = True
 
 import ctypes
 import os
+import functools
 import glob
 import sys
 import subprocess
@@ -27,6 +33,14 @@ if sys.version_info.major > 2:
     _to_char_p = lambda s: s.encode('utf-8')
 else:
     _to_char_p = lambda s: s
+
+
+class GLFWError(Exception):
+    """
+    Exception class used for reporting GLFW errors.
+    """
+    def __init__(self, message):
+        super(GLFWError, self).__init__(message)
 
 
 def _find_library_candidates(library_names,
@@ -539,6 +553,52 @@ CONNECTED = 0x00040001
 DISCONNECTED = 0x00040002
 DONT_CARE = -1
 
+_exc_info_from_callback = None
+def _callback_exception_decorator(func):
+    @functools.wraps(func)
+    def callback_wrapper(*args, **kwargs):
+        global _exc_info_from_callback
+        if _exc_info_from_callback is not None:
+            # We are on the way back to Python after an exception was raised.
+            # Do not call further callbacks and wait for the errcheck function
+            # to handle the exception first.
+            return
+        try:
+            return func(*args, **kwargs)
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except:
+            _exc_info_from_callback = sys.exc_info()
+    return callback_wrapper
+
+
+def _prepare_errcheck():
+    """
+    This function sets the errcheck attribute of all ctypes wrapped functions
+    to evaluate the _exc_info_from_callback global variable and re-raise any
+    exceptions that might have been raised in callbacks.
+    It also modifies all callback types to automatically wrap the function
+    using the _callback_exception_decorator.
+    """
+    def errcheck(result, *args):
+        global _exc_info_from_callback
+        if _exc_info_from_callback is not None:
+            exc = _exc_info_from_callback
+            _exc_info_from_callback = None
+            raise exc[1], None, exc[2]
+        return result
+
+    for symbol in dir(_glfw):
+        if symbol.startswith('glfw'):
+            getattr(_glfw, symbol).errcheck = errcheck
+
+    _globals = globals()
+    for symbol in _globals:
+        if symbol.startswith('_GLFW') and symbol.endswith('fun'):
+            def wrapper_cfunctype(func, cfunctype=_globals[symbol]):
+                return cfunctype(_callback_exception_decorator(func))
+            _globals[symbol] = wrapper_cfunctype
+
 
 _GLFWerrorfun = ctypes.CFUNCTYPE(None,
                                  ctypes.c_int,
@@ -668,9 +728,23 @@ def get_version_string():
     """
     return _glfw.glfwGetVersionString()
 
-_error_callback = None
+@_callback_exception_decorator
+def _raise_glfw_errors_as_exceptions(error_code, description):
+    """
+    Default error callback that raises GLFWError exceptions for glfw errors.
+    Set an alternative error callback or set glfw.ERROR_REPORTING to False to
+    disable this behavior.
+    """
+    global ERROR_REPORTING
+    if ERROR_REPORTING:
+        message = "(%d) %s" % (error_code, description)
+        raise GLFWError(message)
+
+_default_error_callback = _GLFWerrorfun(_raise_glfw_errors_as_exceptions)
+_error_callback = (_raise_glfw_errors_as_exceptions, _default_error_callback)
 _glfw.glfwSetErrorCallback.restype = _GLFWerrorfun
 _glfw.glfwSetErrorCallback.argtypes = [_GLFWerrorfun]
+_glfw.glfwSetErrorCallback(_default_error_callback)
 def set_error_callback(cbfun):
     """
     Sets the error callback.
@@ -681,12 +755,14 @@ def set_error_callback(cbfun):
     global _error_callback
     previous_callback = _error_callback
     if cbfun is None:
-        cbfun = 0
-    c_cbfun = _GLFWerrorfun(cbfun)
+        cbfun = _raise_glfw_errors_as_exceptions
+        c_cbfun = _default_error_callback
+    else:
+        c_cbfun = _GLFWerrorfun(cbfun)
     _error_callback = (cbfun, c_cbfun)
     cbfun = c_cbfun
     _glfw.glfwSetErrorCallback(cbfun)
-    if previous_callback is not None and previous_callback[0] != 0:
+    if previous_callback is not None and previous_callback[0] != _raise_glfw_errors_as_exceptions:
         return previous_callback[0]
 
 _glfw.glfwGetMonitors.restype = ctypes.POINTER(ctypes.POINTER(_GLFWmonitor))
@@ -2148,3 +2224,5 @@ if hasattr(_glfw, 'glfwPostEmptyEvent'):
             void glfwPostEmptyEvent();
         """
         _glfw.glfwPostEmptyEvent()
+
+_prepare_errcheck()
