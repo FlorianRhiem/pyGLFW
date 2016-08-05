@@ -8,7 +8,7 @@ This module provides Python bindings for [GLFW](http://www.glfw.org/) (on GitHub
  - structs have been replaced with Python sequences
  - functions like `glfwGetMonitors` return a list instead of a pointer and an object count
  - Gamma ramps use floats between 0.0 and 1.0 instead of unsigned shorts
- - GLFW errors are reported as `glfw.GLFWError` exceptions if no error callback is set (use glfw.ERROR_REPORTING=False to disable this)
+ - GLFW errors are reported as `glfw.GLFWError` exceptions if no error callback is set (use `glfw.ERROR_REPORTING=False` to disable this)
 
 Example Code
 ------------
