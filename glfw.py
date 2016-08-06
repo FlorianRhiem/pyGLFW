@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
 __copyright__ = 'Copyright (c) 2013-2016 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '1.3.0'
+__version__ = '1.3.1'
 
 # By default (ERROR_REPORTING = True), GLFW errors will be reported as Python
 # exceptions. Set ERROR_REPORTING to False or set a curstom error callback to
@@ -31,8 +31,12 @@ except AttributeError:
     _getcwd = os.getcwd
 if sys.version_info.major > 2:
     _to_char_p = lambda s: s.encode('utf-8')
+    def _reraise(exception, traceback):
+        raise exception.with_traceback(traceback)
 else:
     _to_char_p = lambda s: s
+    def _reraise(exception, traceback):
+        raise (exception, None, traceback)
 
 
 class GLFWError(Exception):
@@ -585,7 +589,7 @@ def _prepare_errcheck():
         if _exc_info_from_callback is not None:
             exc = _exc_info_from_callback
             _exc_info_from_callback = None
-            raise exc[1], None, exc[2]
+            _reraise(exc[1], exc[2])
         return result
 
     for symbol in dir(_glfw):
