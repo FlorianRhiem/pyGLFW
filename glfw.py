@@ -163,6 +163,7 @@ else:
                           ['',
                            '/usr/lib64', '/usr/local/lib64',
                            '/usr/lib', '/usr/local/lib',
+                           '/run/current-system/sw/lib',
                            '/usr/lib/x86_64-linux-gnu/'], _glfw_get_version)
 
 if _glfw is None:
