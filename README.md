@@ -10,6 +10,17 @@ This module provides Python bindings for [GLFW](http://www.glfw.org/) (on GitHub
  - Gamma ramps use floats between 0.0 and 1.0 instead of unsigned shorts
  - GLFW errors are reported as `glfw.GLFWError` exceptions if no error callback is set (use `glfw.ERROR_REPORTING=False` to disable this)
 
+Installation
+------------
+
+pyGLFW can be installed using pip:
+
+```sh
+pip install glfw
+```
+
+To use the module, you also need to install the actual GLFW shared library. Linux and macOS users should [compile the library from source](http://www.glfw.org/docs/latest/compile.html) (use `-DBUILD_SHARED_LIBS=ON`) and Windows users can download binaries on the [GLFW download site](http://www.glfw.org/download.html).
+
 Example Code
 ------------
 The example from the [GLFW documentation](http://www.glfw.org/documentation.html) ported to pyGLFW:
