@@ -19,7 +19,7 @@ pyGLFW can be installed using pip:
 pip install glfw
 ```
 
-To use the module, you also need to install the actual GLFW shared library. Linux and macOS users should [compile the library from source](http://www.glfw.org/docs/latest/compile.html) (use `-DBUILD_SHARED_LIBS=ON`) and Windows users can download binaries on the [GLFW download site](http://www.glfw.org/download.html).
+To use the module, you also need to install the actual GLFW shared library. Linux and macOS users should [compile the library from source](http://www.glfw.org/docs/latest/compile.html) (use `-DBUILD_SHARED_LIBS=ON`) and Windows users can download binaries on the [GLFW download site](http://www.glfw.org/download.html). pyGLFW will search for the library in a list of search paths (including those in `LD_LIBRARY_PATH` on Linux and `DYLD_LIBRARY_PATH` on macOS). If you want to use a specific library, you can set the `PYGLFW_LIBRARY` environment variable to its path.
 
 Example Code
 ------------

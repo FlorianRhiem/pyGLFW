@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
 __copyright__ = 'Copyright (c) 2013-2016 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '1.3.3'
+__version__ = '1.4.0'
 
 # By default (ERROR_REPORTING = True), GLFW errors will be reported as Python
 # exceptions. Set ERROR_REPORTING to False or set a curstom error callback to
@@ -152,7 +152,35 @@ def _glfw_get_version(filename):
     else:
         return None
 
-if sys.platform == 'win32':
+
+def _get_library_search_paths():
+    """
+    Returns a list of library search paths, considering of the current working
+    directory, default paths and paths from environment variables.
+    """
+    search_paths = [
+        '',
+        '/usr/lib64',
+        '/usr/local/lib64',
+        '/usr/lib', '/usr/local/lib',
+        '/run/current-system/sw/lib',
+        '/usr/lib/x86_64-linux-gnu/'
+    ]
+
+    if sys.platform == 'darwin':
+        path_environment_variable = 'DYLD_LIBRARY_PATH'
+    else:
+        path_environment_variable = 'LD_LIBRARY_PATH'
+    if path_environment_variable in os.environ:
+        search_paths.extend(os.environ[path_environment_variable].split(':'))
+    return search_paths
+
+if os.environ.get('PYGLFW_LIBRARY', ''):
+    try:
+        _glfw = ctypes.CDLL(os.environ['PYGLFW_LIBRARY'])
+    except OSError:
+        _glfw = None
+elif sys.platform == 'win32':
     # only try glfw3.dll on windows
     try:
         _glfw = ctypes.CDLL('glfw3.dll')
@@ -160,11 +188,7 @@ if sys.platform == 'win32':
         _glfw = None
 else:
     _glfw = _load_library(['glfw', 'glfw3'], ['.so', '.dylib'],
-                          ['',
-                           '/usr/lib64', '/usr/local/lib64',
-                           '/usr/lib', '/usr/local/lib',
-                           '/run/current-system/sw/lib',
-                           '/usr/lib/x86_64-linux-gnu/'], _glfw_get_version)
+                          _get_library_search_paths(), _glfw_get_version)
 
 if _glfw is None:
     raise ImportError("Failed to load GLFW3 shared library.")
