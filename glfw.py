@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
 __copyright__ = 'Copyright (c) 2013-2016 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '1.4.0'
+__version__ = '1.5.0'
 
 # By default (ERROR_REPORTING = True), GLFW errors will be reported as Python
 # exceptions. Set ERROR_REPORTING to False or set a curstom error callback to
@@ -326,15 +326,24 @@ class _GLFWimage(ctypes.Structure):
 
     def wrap(self, image):
         """
-        Wraps a nested python sequence.
+        Wraps a nested python sequence or PIL/pillow Image.
         """
-        self.width, self.height, pixels = image
-        array_type = ctypes.c_ubyte * 4 * self.width * self.height
-        self.pixels_array = array_type()
-        for i in range(self.height):
-            for j in range(self.width):
-                for k in range(4):
-                    self.pixels_array[i][j][k] = pixels[i][j][k]
+        if hasattr(image, 'size') and hasattr(image, 'convert'):
+            # Treat image as PIL/pillow Image object
+            self.width, self.height = image.size
+            array_type = ctypes.c_ubyte * 4 * (self.width * self.height)
+            self.pixels_array = array_type()
+            pixels = image.convert('RGBA').getdata()
+            for i, pixel in enumerate(pixels):
+                self.pixels_array[i] = pixel
+        else:
+            self.width, self.height, pixels = image
+            array_type = ctypes.c_ubyte * 4 * self.width * self.height
+            self.pixels_array = array_type()
+            for i in range(self.height):
+                for j in range(self.width):
+                    for k in range(4):
+                        self.pixels_array[i][j][k] = pixels[i][j][k]
         pointer_type = ctypes.POINTER(ctypes.c_ubyte)
         self.pixels = ctypes.cast(self.pixels_array, pointer_type)
 
@@ -2117,16 +2126,21 @@ if hasattr(_glfw, 'glfwSetWindowIcon'):
                                         ctypes.POINTER(_GLFWimage)]
 
 
-    def set_window_icon(window, count, image):
+    def set_window_icon(window, count, images):
         """
         Sets the icon for the specified window.
 
         Wrapper for:
             void glfwSetWindowIcon(GLFWwindow* window, int count, const GLFWimage* images);
         """
-        _image = _GLFWimage()
-        _image.wrap(image)
-        _glfw.glfwSetWindowIcon(window, count, ctypes.pointer(_image))
+        if count == 1 and (not hasattr(images, '__len__') or len(images) == 3):
+            # Stay compatible to calls passing a single icon
+            images = [images]
+        array_type = _GLFWimage * count
+        _images = array_type()
+        for i, image in enumerate(images):
+            _images[i].wrap(image)
+        _glfw.glfwSetWindowIcon(window, count, _images)
 
 if hasattr(_glfw, 'glfwSetWindowSizeLimits'):
     _glfw.glfwSetWindowSizeLimits.restype = None
