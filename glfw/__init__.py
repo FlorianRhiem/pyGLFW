@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
 __copyright__ = 'Copyright (c) 2013-2016 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '1.5.0'
+__version__ = '1.5.1'
 
 # By default (ERROR_REPORTING = True), GLFW errors will be reported as Python
 # exceptions. Set ERROR_REPORTING to False or set a curstom error callback to
@@ -164,7 +164,8 @@ def _get_library_search_paths():
         '/usr/local/lib64',
         '/usr/lib', '/usr/local/lib',
         '/run/current-system/sw/lib',
-        '/usr/lib/x86_64-linux-gnu/'
+        '/usr/lib/x86_64-linux-gnu/',
+        os.path.abspath(os.path.dirname(__file__))
     ]
 
     if sys.platform == 'darwin':
@@ -175,17 +176,22 @@ def _get_library_search_paths():
         search_paths.extend(os.environ[path_environment_variable].split(':'))
     return search_paths
 
+
 if os.environ.get('PYGLFW_LIBRARY', ''):
     try:
         _glfw = ctypes.CDLL(os.environ['PYGLFW_LIBRARY'])
     except OSError:
         _glfw = None
 elif sys.platform == 'win32':
-    # only try glfw3.dll on windows
+    # try glfw3.dll using windows search paths
     try:
         _glfw = ctypes.CDLL('glfw3.dll')
     except OSError:
-        _glfw = None
+        # try glfw3.dll in package directory
+        try:
+            _glfw = ctypes.CDLL(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'glfw3.dll'))
+        except OSError:
+            _glfw = None
 else:
     _glfw = _load_library(['glfw', 'glfw3'], ['.so', '.dylib'],
                           _get_library_search_paths(), _glfw_get_version)
