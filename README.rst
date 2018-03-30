@@ -10,6 +10,8 @@ except for:
    instead of ``camelCase``
 -  ``GLFW_`` and ``glfw`` prefixes have been removed, as their function
    is replaced by the module namespace
+   (you can use ``from glfw.GLFW import *`` if you prefer the naming
+   convention used by the GLFW C API)
 -  structs have been replaced with Python sequences and namedtuples
 -  functions like ``glfwGetMonitors`` return a list instead of a pointer
    and an object count
