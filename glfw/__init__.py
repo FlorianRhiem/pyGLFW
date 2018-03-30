@@ -18,9 +18,6 @@ import re
 _globals = globals()
 
 for name in dir(GLFW):
-    if name.startswith("_"):
-        continue
-
     if name.startswith("GLFW_"):
         macro_name = name[5:]
         _globals[macro_name] = getattr(GLFW, name)
