@@ -7,9 +7,9 @@ from __future__ import division
 from __future__ import unicode_literals
 
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
-__copyright__ = 'Copyright (c) 2013-2016 Florian Rhiem'
+__copyright__ = 'Copyright (c) 2013-2018 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '1.6'
+__version__ = '1.7.0'
 
 # By default (ERROR_REPORTING = True), GLFW errors will be reported as Python
 # exceptions. Set ERROR_REPORTING to False or set a curstom error callback to
