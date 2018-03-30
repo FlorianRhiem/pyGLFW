@@ -16,6 +16,12 @@ __version__ = '1.5.1'
 # disable this behavior.
 ERROR_REPORTING = True
 
+# By default (NORMALIZE_GAMMA_RAMPS = True), gamma ramps are expected to
+# contain values between 0 and 1, and the conversion to unsigned shorts will
+# be performed internally. Set NORMALIZE_GAMMA_RAMPS to False if you want
+# to disable this behavior and use integral values between 0 and 65535.
+NORMALIZE_GAMMA_RAMPS = True
+
 import ctypes
 import os
 import functools
@@ -287,10 +293,14 @@ class _GLFWgammaramp(ctypes.Structure):
         self.red_array = array_type()
         self.green_array = array_type()
         self.blue_array = array_type()
+        if NORMALIZE_GAMMA_RAMPS:
+            red = [value * 65535 for value in red]
+            green = [value * 65535 for value in green]
+            blue = [value * 65535 for value in blue]
         for i in range(self.size):
-            self.red_array[i] = int(red[i]*65535)
-            self.green_array[i] = int(green[i]*65535)
-            self.blue_array[i] = int(blue[i]*65535)
+            self.red_array[i] = int(red[i])
+            self.green_array[i] = int(green[i])
+            self.blue_array[i] = int(blue[i])
         pointer_type = ctypes.POINTER(ctypes.c_ushort)
         self.red = ctypes.cast(self.red_array, pointer_type)
         self.green = ctypes.cast(self.green_array, pointer_type)
@@ -300,9 +310,13 @@ class _GLFWgammaramp(ctypes.Structure):
         """
         Returns a nested python sequence.
         """
-        red = [self.red[i]/65535.0 for i in range(self.size)]
-        green = [self.green[i]/65535.0 for i in range(self.size)]
-        blue = [self.blue[i]/65535.0 for i in range(self.size)]
+        red = [self.red[i] for i in range(self.size)]
+        green = [self.green[i] for i in range(self.size)]
+        blue = [self.blue[i] for i in range(self.size)]
+        if NORMALIZE_GAMMA_RAMPS:
+            red = [value / 65535.0 for value in red]
+            green = [value / 65535.0 for value in green]
+            blue = [value / 65535.0 for value in blue]
         return red, green, blue
 
 
