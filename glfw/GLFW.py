@@ -1,3 +1,7 @@
+"""
+Python bindings for GLFW.
+"""
+
 from __future__ import print_function
 from __future__ import division
 from __future__ import unicode_literals
@@ -7,16 +11,29 @@ from __future__ import unicode_literals
 # disable this behavior.
 GLFW_ERROR_REPORTING = True
 
+# By default (GLFW_NORMALIZE_GAMMA_RAMPS = True), gamma ramps are expected to
+# contain values between 0 and 1, and the conversion to unsigned shorts will
+# be performed internally. Set GLFW_NORMALIZE_GAMMA_RAMPS to False if you want
+# to disable this behavior and use integral values between 0 and 65535.
+GLFW_NORMALIZE_GAMMA_RAMPS = True
+
 # This is for checking whether or not ERROR_REPORTING is enabled in the main module
 _error_reporting_query_func = None
 
+# This is for checking whether or not NORMALIZE_GAMMA_RAMPS is enabled in the main module
+_normalize_gamma_ramps_query_func = None
+
+import collections
 import ctypes
 import os
 import functools
-import glob
 import sys
-import subprocess
-import textwrap
+
+from .library import glfw as _glfw
+
+if _glfw is None:
+    raise ImportError("Failed to load GLFW3 shared library.")
+
 
 # Python 3 compatibility:
 try:
@@ -39,159 +56,6 @@ class GLFWError(Exception):
     """
     def __init__(self, message):
         super(GLFWError, self).__init__(message)
-
-
-def _find_library_candidates(library_names,
-                             library_file_extensions,
-                             library_search_paths):
-    """
-    Finds and returns filenames which might be the library you are looking for.
-    """
-    candidates = set()
-    for library_name in library_names:
-        for search_path in library_search_paths:
-            glob_query = os.path.join(search_path, '*'+library_name+'*')
-            for filename in glob.iglob(glob_query):
-                filename = os.path.realpath(filename)
-                if filename in candidates:
-                    continue
-                basename = os.path.basename(filename)
-                if basename.startswith('lib'+library_name):
-                    basename_end = basename[len('lib'+library_name):]
-                elif basename.startswith(library_name):
-                    basename_end = basename[len(library_name):]
-                else:
-                    continue
-                for file_extension in library_file_extensions:
-                    if basename_end.startswith(file_extension):
-                        if basename_end[len(file_extension):][:1] in ('', '.'):
-                            candidates.add(filename)
-                    if basename_end.endswith(file_extension):
-                        basename_middle = basename_end[:-len(file_extension)]
-                        if all(c in '0123456789.' for c in basename_middle):
-                            candidates.add(filename)
-    return candidates
-
-
-def _load_library(library_names, library_file_extensions,
-                  library_search_paths, version_check_callback):
-    """
-    Finds, loads and returns the most recent version of the library.
-    """
-    candidates = _find_library_candidates(library_names,
-                                          library_file_extensions,
-                                          library_search_paths)
-    library_versions = []
-    for filename in candidates:
-        version = version_check_callback(filename)
-        if version is not None and version >= (3, 0, 0):
-            library_versions.append((version, filename))
-
-    if not library_versions:
-        return None
-    library_versions.sort()
-    return ctypes.CDLL(library_versions[-1][1])
-
-
-def _glfw_get_version(filename):
-    """
-    Queries and returns the library version tuple or None by using a
-    subprocess.
-    """
-    version_checker_source = '''
-        import sys
-        import ctypes
-
-        def get_version(library_handle):
-            """
-            Queries and returns the library version tuple or None.
-            """
-            major_value = ctypes.c_int(0)
-            major = ctypes.pointer(major_value)
-            minor_value = ctypes.c_int(0)
-            minor = ctypes.pointer(minor_value)
-            rev_value = ctypes.c_int(0)
-            rev = ctypes.pointer(rev_value)
-            if hasattr(library_handle, 'glfwGetVersion'):
-                library_handle.glfwGetVersion(major, minor, rev)
-                version = (major_value.value,
-                           minor_value.value,
-                           rev_value.value)
-                return version
-            else:
-                return None
-
-        try:
-            input_func = raw_input
-        except NameError:
-            input_func = input
-        filename = input_func().strip()
-
-        try:
-            library_handle = ctypes.CDLL(filename)
-        except OSError:
-            pass
-        else:
-            version = get_version(library_handle)
-            print(version)
-    '''
-
-    args = [sys.executable, '-c', textwrap.dedent(version_checker_source)]
-    process = subprocess.Popen(args, universal_newlines=True,
-                               stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    out = process.communicate(filename)[0]
-    out = out.strip()
-    if out:
-        return eval(out)
-    else:
-        return None
-
-
-def _get_library_search_paths():
-    """
-    Returns a list of library search paths, considering of the current working
-    directory, default paths and paths from environment variables.
-    """
-    search_paths = [
-        '',
-        '/usr/lib64',
-        '/usr/local/lib64',
-        '/usr/lib', '/usr/local/lib',
-        '/run/current-system/sw/lib',
-        '/usr/lib/x86_64-linux-gnu/',
-        os.path.abspath(os.path.dirname(__file__))
-    ]
-
-    if sys.platform == 'darwin':
-        path_environment_variable = 'DYLD_LIBRARY_PATH'
-    else:
-        path_environment_variable = 'LD_LIBRARY_PATH'
-    if path_environment_variable in os.environ:
-        search_paths.extend(os.environ[path_environment_variable].split(':'))
-    return search_paths
-
-
-if os.environ.get('PYGLFW_LIBRARY', ''):
-    try:
-        _glfw = ctypes.CDLL(os.environ['PYGLFW_LIBRARY'])
-    except OSError:
-        _glfw = None
-elif sys.platform == 'win32':
-    # try glfw3.dll using windows search paths
-    try:
-        _glfw = ctypes.CDLL('glfw3.dll')
-    except OSError:
-        # try glfw3.dll in package directory
-        try:
-            _glfw = ctypes.CDLL(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'glfw3.dll'))
-        except OSError:
-            _glfw = None
-else:
-    _glfw = _load_library(['glfw', 'glfw3'], ['.so', '.dylib'],
-                          _get_library_search_paths(), _glfw_get_version)
-
-if _glfw is None:
-    raise ImportError("Failed to load GLFW3 shared library.")
 
 _callback_repositories = []
 
@@ -224,6 +88,16 @@ class _GLFWvidmode(ctypes.Structure):
                 ("blue_bits", ctypes.c_int),
                 ("refresh_rate", ctypes.c_uint)]
 
+    GLFWvidmode = collections.namedtuple('GLFWvidmode', [
+        'size', 'bits', 'refresh_rate'
+    ])
+    Size = collections.namedtuple('Size', [
+        'width', 'height'
+    ])
+    Bits = collections.namedtuple('Bits', [
+        'red', 'green', 'blue'
+    ])
+
     def __init__(self):
         ctypes.Structure.__init__(self)
         self.width = 0
@@ -243,11 +117,11 @@ class _GLFWvidmode(ctypes.Structure):
 
     def unwrap(self):
         """
-        Returns a nested python sequence.
+        Returns a GLFWvidmode object.
         """
-        size = self.width, self.height
-        bits = self.red_bits, self.green_bits, self.blue_bits
-        return size, bits, self.refresh_rate
+        size = self.Size(self.width, self.height)
+        bits = self.Bits(self.red_bits, self.green_bits, self.blue_bits)
+        return self.GLFWvidmode(size, bits, self.refresh_rate)
 
 
 class _GLFWgammaramp(ctypes.Structure):
@@ -259,6 +133,10 @@ class _GLFWgammaramp(ctypes.Structure):
                 ("green", ctypes.POINTER(ctypes.c_ushort)),
                 ("blue", ctypes.POINTER(ctypes.c_ushort)),
                 ("size", ctypes.c_uint)]
+
+    GLFWgammaramp = collections.namedtuple('GLFWgammaramp', [
+        'red', 'green', 'blue'
+    ])
 
     def __init__(self):
         ctypes.Structure.__init__(self)
@@ -281,10 +159,14 @@ class _GLFWgammaramp(ctypes.Structure):
         self.red_array = array_type()
         self.green_array = array_type()
         self.blue_array = array_type()
+        if all((GLFW_NORMALIZE_GAMMA_RAMPS, _normalize_gamma_ramps_query_func())):
+            red = [value * 65535 for value in red]
+            green = [value * 65535 for value in green]
+            blue = [value * 65535 for value in blue]
         for i in range(self.size):
-            self.red_array[i] = int(red[i]*65535)
-            self.green_array[i] = int(green[i]*65535)
-            self.blue_array[i] = int(blue[i]*65535)
+            self.red_array[i] = int(red[i])
+            self.green_array[i] = int(green[i])
+            self.blue_array[i] = int(blue[i])
         pointer_type = ctypes.POINTER(ctypes.c_ushort)
         self.red = ctypes.cast(self.red_array, pointer_type)
         self.green = ctypes.cast(self.green_array, pointer_type)
@@ -292,12 +174,16 @@ class _GLFWgammaramp(ctypes.Structure):
 
     def unwrap(self):
         """
-        Returns a nested python sequence.
+        Returns a GLFWgammaramp object.
         """
-        red = [self.red[i]/65535.0 for i in range(self.size)]
-        green = [self.green[i]/65535.0 for i in range(self.size)]
-        blue = [self.blue[i]/65535.0 for i in range(self.size)]
-        return red, green, blue
+        red = [self.red[i] for i in range(self.size)]
+        green = [self.green[i] for i in range(self.size)]
+        blue = [self.blue[i] for i in range(self.size)]
+        if all((GLFW_NORMALIZE_GAMMA_RAMPS, _normalize_gamma_ramps_query_func())):
+            red = [value / 65535.0 for value in red]
+            green = [value / 65535.0 for value in green]
+            blue = [value / 65535.0 for value in blue]
+        return self.GLFWgammaramp(red, green, blue)
 
 
 class _GLFWcursor(ctypes.Structure):
@@ -316,6 +202,10 @@ class _GLFWimage(ctypes.Structure):
     _fields_ = [("width", ctypes.c_int),
                 ("height", ctypes.c_int),
                 ("pixels", ctypes.POINTER(ctypes.c_ubyte))]
+
+    GLFWimage = collections.namedtuple('GLFWimage', [
+        'width', 'height', 'pixels'
+    ])
 
     def __init__(self):
         ctypes.Structure.__init__(self)
@@ -349,10 +239,10 @@ class _GLFWimage(ctypes.Structure):
 
     def unwrap(self):
         """
-        Returns a nested python sequence.
+        Returns a GLFWimage object.
         """
         pixels = [[[int(c) for c in p] for p in l] for l in self.pixels_array]
-        return self.width, self.height, pixels
+        return self.GLFWimage(self.width, self.height, pixels)
 
 
 GLFW_VERSION_MAJOR = 3
@@ -770,8 +660,8 @@ def glfwGetVersionString():
 def _raise_glfw_errors_as_exceptions(error_code, description):
     """
     Default error callback that raises GLFWError exceptions for glfw errors.
-    Set an alternative error callback or set glfw.ERROR_REPORTING or
-    glfw.GLFW.GLFW_ERROR_REPORTING to False to disable this behavior.
+    Set an alternative error callback or set glfw.ERROR_REPORTING to False to
+    disable this behavior.
     """
     global GLFW_ERROR_REPORTING, _error_reporting_query_func
     if all((GLFW_ERROR_REPORTING, _error_reporting_query_func())):
