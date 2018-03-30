@@ -10,7 +10,7 @@ except for:
    instead of ``camelCase``
 -  ``GLFW_`` and ``glfw`` prefixes have been removed, as their function
    is replaced by the module namespace
--  structs have been replaced with Python sequences
+-  structs have been replaced with Python sequences and namedtuples
 -  functions like ``glfwGetMonitors`` return a list instead of a pointer
    and an object count
 -  Gamma ramps use floats between 0.0 and 1.0 instead of unsigned shorts

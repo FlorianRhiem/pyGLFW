@@ -22,6 +22,7 @@ ERROR_REPORTING = True
 # to disable this behavior and use integral values between 0 and 65535.
 NORMALIZE_GAMMA_RAMPS = True
 
+import collections
 import ctypes
 import os
 import functools
@@ -236,6 +237,16 @@ class _GLFWvidmode(ctypes.Structure):
                 ("blue_bits", ctypes.c_int),
                 ("refresh_rate", ctypes.c_uint)]
 
+    GLFWvidmode = collections.namedtuple('GLFWvidmode', [
+        'size', 'bits', 'refresh_rate'
+    ])
+    Size = collections.namedtuple('Size', [
+        'width', 'height'
+    ])
+    Bits = collections.namedtuple('Bits', [
+        'red', 'green', 'blue'
+    ])
+
     def __init__(self):
         ctypes.Structure.__init__(self)
         self.width = 0
@@ -255,11 +266,11 @@ class _GLFWvidmode(ctypes.Structure):
 
     def unwrap(self):
         """
-        Returns a nested python sequence.
+        Returns a GLFWvidmode object.
         """
-        size = self.width, self.height
-        bits = self.red_bits, self.green_bits, self.blue_bits
-        return size, bits, self.refresh_rate
+        size = self.Size(self.width, self.height)
+        bits = self.Bits(self.red_bits, self.green_bits, self.blue_bits)
+        return self.GLFWvidmode(size, bits, self.refresh_rate)
 
 
 class _GLFWgammaramp(ctypes.Structure):
@@ -271,6 +282,10 @@ class _GLFWgammaramp(ctypes.Structure):
                 ("green", ctypes.POINTER(ctypes.c_ushort)),
                 ("blue", ctypes.POINTER(ctypes.c_ushort)),
                 ("size", ctypes.c_uint)]
+
+    GLFWgammaramp = collections.namedtuple('GLFWgammaramp', [
+        'red', 'green', 'blue'
+    ])
 
     def __init__(self):
         ctypes.Structure.__init__(self)
@@ -308,7 +323,7 @@ class _GLFWgammaramp(ctypes.Structure):
 
     def unwrap(self):
         """
-        Returns a nested python sequence.
+        Returns a GLFWgammaramp object.
         """
         red = [self.red[i] for i in range(self.size)]
         green = [self.green[i] for i in range(self.size)]
@@ -317,7 +332,7 @@ class _GLFWgammaramp(ctypes.Structure):
             red = [value / 65535.0 for value in red]
             green = [value / 65535.0 for value in green]
             blue = [value / 65535.0 for value in blue]
-        return red, green, blue
+        return self.GLFWgammaramp(red, green, blue)
 
 
 class _GLFWcursor(ctypes.Structure):
@@ -336,6 +351,10 @@ class _GLFWimage(ctypes.Structure):
     _fields_ = [("width", ctypes.c_int),
                 ("height", ctypes.c_int),
                 ("pixels", ctypes.POINTER(ctypes.c_ubyte))]
+
+    GLFWimage = collections.namedtuple('GLFWimage', [
+        'width', 'height', 'pixels'
+    ])
 
     def __init__(self):
         ctypes.Structure.__init__(self)
@@ -369,10 +388,10 @@ class _GLFWimage(ctypes.Structure):
 
     def unwrap(self):
         """
-        Returns a nested python sequence.
+        Returns a GLFWimage object.
         """
         pixels = [[[int(c) for c in p] for p in l] for l in self.pixels_array]
-        return self.width, self.height, pixels
+        return self.GLFWimage(self.width, self.height, pixels)
 
 
 VERSION_MAJOR = 3
