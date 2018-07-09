@@ -866,14 +866,14 @@ def default_window_hints():
 _glfw.glfwWindowHint.restype = None
 _glfw.glfwWindowHint.argtypes = [ctypes.c_int,
                                  ctypes.c_int]
-def window_hint(target, hint):
+def window_hint(hint, value):
     """
     Sets the specified window hint to the desired value.
 
     Wrapper for:
-        void glfwWindowHint(int target, int hint);
+        void glfwWindowHint(int hint, int value);
     """
-    _glfw.glfwWindowHint(target, hint)
+    _glfw.glfwWindowHint(hint, value)
 
 _glfw.glfwCreateWindow.restype = ctypes.POINTER(_GLFWwindow)
 _glfw.glfwCreateWindow.argtypes = [ctypes.c_int,
