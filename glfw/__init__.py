@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
 __copyright__ = 'Copyright (c) 2013-2018 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '1.7.0'
+__version__ = '1.7.1'
 
 # By default (ERROR_REPORTING = True), GLFW errors will be reported as Python
 # exceptions. Set ERROR_REPORTING to False or set a curstom error callback to
@@ -46,7 +46,8 @@ if sys.version_info.major > 2:
 else:
     _to_char_p = lambda s: s
     def _reraise(exception, traceback):
-        raise (exception, None, traceback)
+        # wrapped in exec, as python 3 does not support this variant of raise
+        exec("raise exception, None, traceback")
 
 
 class GLFWError(Exception):
