@@ -7,7 +7,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
-__copyright__ = 'Copyright (c) 2013-2018 Florian Rhiem'
+__copyright__ = 'Copyright (c) 2013-2019 Florian Rhiem'
 __license__ = 'MIT'
 __version__ = '1.7.1'
 
@@ -245,12 +245,59 @@ class _GLFWimage(ctypes.Structure):
         return self.GLFWimage(self.width, self.height, pixels)
 
 
+class _GLFWgamepadstate(ctypes.Structure):
+    """
+    Wrapper for:
+        typedef struct GLFWgamepadstate GLFWgamepadstate;
+    """
+    _fields_ = [("buttons", (ctypes.c_ubyte * 15)),
+                ("axes", (ctypes.c_float * 6))]
+
+    GLFWgamepadstate = collections.namedtuple('GLFWgamepadstate', [
+        'buttons', 'axes'
+    ])
+
+    def __init__(self):
+        ctypes.Structure.__init__(self)
+        self.buttons = (ctypes.c_ubyte * 15)([0] * 15)
+        self.axes = (ctypes.c_float * 6)([0] * 6)
+
+    def wrap(self, gamepad_state):
+        """
+        Wraps a nested python sequence.
+        """
+        buttons, axes = gamepad_state
+        for i in range(15):
+            self.buttons[i] = buttons[i]
+        for i in range(6):
+            self.axes[i] = axes[i]
+
+    def unwrap(self):
+        """
+        Returns a GLFWvidmode object.
+        """
+        buttons = [int(button) for button in self.buttons]
+        axes = [float(axis) for axis in self.axes]
+        return self.GLFWgamepadstate(buttons, axes)
+
+
 VERSION_MAJOR = 3
-VERSION_MINOR = 2
-VERSION_REVISION = 1
+VERSION_MINOR = 3
+VERSION_REVISION = 0
+TRUE = 1
+FALSE = 0
 RELEASE = 0
 PRESS = 1
 REPEAT = 2
+HAT_CENTERED = 0
+HAT_UP = 1
+HAT_DOWN = 2
+HAT_RIGHT = 4
+HAT_LEFT = 8
+HAT_RIGHT_UP = HAT_RIGHT | HAT_UP
+HAT_RIGHT_DOWN = HAT_RIGHT | HAT_DOWN
+HAT_LEFT_UP = HAT_LEFT | HAT_UP
+HAT_LEFT_DOWN = HAT_LEFT | HAT_DOWN
 KEY_UNKNOWN = -1
 KEY_SPACE = 32
 KEY_APOSTROPHE = 39
@@ -377,6 +424,8 @@ MOD_SHIFT = 0x0001
 MOD_CONTROL = 0x0002
 MOD_ALT = 0x0004
 MOD_SUPER = 0x0008
+MOD_CAPS_LOCK = 0x0010
+MOD_NUM_LOCK = 0x0020
 MOUSE_BUTTON_1 = 0
 MOUSE_BUTTON_2 = 1
 MOUSE_BUTTON_3 = 2
@@ -406,6 +455,34 @@ JOYSTICK_14 = 13
 JOYSTICK_15 = 14
 JOYSTICK_16 = 15
 JOYSTICK_LAST = JOYSTICK_16
+GAMEPAD_BUTTON_A = 0
+GAMEPAD_BUTTON_B = 1
+GAMEPAD_BUTTON_X = 2
+GAMEPAD_BUTTON_Y = 3
+GAMEPAD_BUTTON_LEFT_BUMPER = 4
+GAMEPAD_BUTTON_RIGHT_BUMPER = 5
+GAMEPAD_BUTTON_BACK = 6
+GAMEPAD_BUTTON_START = 7
+GAMEPAD_BUTTON_GUIDE = 8
+GAMEPAD_BUTTON_LEFT_THUMB = 9
+GAMEPAD_BUTTON_RIGHT_THUMB = 10
+GAMEPAD_BUTTON_DPAD_UP = 11
+GAMEPAD_BUTTON_DPAD_RIGHT = 12
+GAMEPAD_BUTTON_DPAD_DOWN = 13
+GAMEPAD_BUTTON_DPAD_LEFT = 14
+GAMEPAD_BUTTON_LAST = GAMEPAD_BUTTON_DPAD_LEFT
+GAMEPAD_BUTTON_CROSS = GAMEPAD_BUTTON_A
+GAMEPAD_BUTTON_CIRCLE = GAMEPAD_BUTTON_B
+GAMEPAD_BUTTON_SQUARE = GAMEPAD_BUTTON_X
+GAMEPAD_BUTTON_TRIANGLE = GAMEPAD_BUTTON_Y
+GAMEPAD_AXIS_LEFT_X = 0
+GAMEPAD_AXIS_LEFT_Y = 1
+GAMEPAD_AXIS_RIGHT_X = 2
+GAMEPAD_AXIS_RIGHT_Y = 3
+GAMEPAD_AXIS_LEFT_TRIGGER = 4
+GAMEPAD_AXIS_RIGHT_TRIGGER = 5
+GAMEPAD_AXIS_LAST = GAMEPAD_AXIS_RIGHT_TRIGGER
+NO_ERROR = 0
 NOT_INITIALIZED = 0x00010001
 NO_CURRENT_CONTEXT = 0x00010002
 INVALID_ENUM = 0x00010003
@@ -424,6 +501,10 @@ DECORATED = 0x00020005
 AUTO_ICONIFY = 0x00020006
 FLOATING = 0x00020007
 MAXIMIZED = 0x00020008
+CENTER_CURSOR = 0x00020009
+TRANSPARENT_FRAMEBUFFER = 0x0002000A
+HOVERED = 0x0002000B
+FOCUS_ON_SHOW = 0x0002000C
 RED_BITS = 0x00021001
 GREEN_BITS = 0x00021002
 BLUE_BITS = 0x00021003
@@ -451,6 +532,12 @@ OPENGL_PROFILE = 0x00022008
 CONTEXT_RELEASE_BEHAVIOR = 0x00022009
 CONTEXT_NO_ERROR = 0x0002200A
 CONTEXT_CREATION_API = 0x0002200B
+SCALE_TO_MONITOR = 0x0002200C
+COCOA_RETINA_FRAMEBUFFER = 0x00023001
+COCOA_FRAME_NAME = 0x00023002
+COCOA_GRAPHICS_SWITCHING = 0x00023003
+X11_CLASS_NAME = 0x00024001
+X11_INSTANCE_NAME = 0x00024002
 NO_API = 0
 OPENGL_API = 0x00030001
 OPENGL_ES_API = 0x00030002
@@ -463,6 +550,8 @@ OPENGL_COMPAT_PROFILE = 0x00032002
 CURSOR = 0x00033001
 STICKY_KEYS = 0x00033002
 STICKY_MOUSE_BUTTONS = 0x00033003
+LOCK_KEY_MODS = 0x00033004
+RAW_MOUSE_MOTION = 0x00033005
 CURSOR_NORMAL = 0x00034001
 CURSOR_HIDDEN = 0x00034002
 CURSOR_DISABLED = 0x00034003
@@ -471,6 +560,7 @@ RELEASE_BEHAVIOR_FLUSH = 0x00035001
 RELEASE_BEHAVIOR_NONE = 0x00035002
 NATIVE_CONTEXT_API = 0x00036001
 EGL_CONTEXT_API = 0x00036002
+OSMESA_CONTEXT_API = 0x00036003
 ARROW_CURSOR = 0x00036001
 IBEAM_CURSOR = 0x00036002
 CROSSHAIR_CURSOR = 0x00036003
@@ -479,6 +569,9 @@ HRESIZE_CURSOR = 0x00036005
 VRESIZE_CURSOR = 0x00036006
 CONNECTED = 0x00040001
 DISCONNECTED = 0x00040002
+JOYSTICK_HAT_BUTTONS = 0x00050001
+COCOA_CHDIR_RESOURCES = 0x00051001
+COCOA_MENUBAR = 0x00051002
 DONT_CARE = -1
 
 _exc_info_from_callback = None
@@ -549,10 +642,17 @@ _GLFWwindowfocusfun = ctypes.CFUNCTYPE(None,
 _GLFWwindowiconifyfun = ctypes.CFUNCTYPE(None,
                                          ctypes.POINTER(_GLFWwindow),
                                          ctypes.c_int)
+_GLFWwindowmaximizefun = ctypes.CFUNCTYPE(None,
+                                          ctypes.POINTER(_GLFWwindow),
+                                          ctypes.c_int)
 _GLFWframebuffersizefun = ctypes.CFUNCTYPE(None,
                                            ctypes.POINTER(_GLFWwindow),
                                            ctypes.c_int,
                                            ctypes.c_int)
+_GLFWwindowcontentscalefun = ctypes.CFUNCTYPE(None,
+                                              ctypes.POINTER(_GLFWwindow),
+                                              ctypes.c_float,
+                                              ctypes.c_float)
 _GLFWmousebuttonfun = ctypes.CFUNCTYPE(None,
                                        ctypes.POINTER(_GLFWwindow),
                                        ctypes.c_int,
@@ -625,6 +725,21 @@ def terminate():
         del _window_user_data_repository[window_addr]
     _glfw.glfwTerminate()
 
+
+if hasattr(_glfw, 'glfwInitHint'):
+    _glfw.glfwInitHint.restype = None
+    _glfw.glfwInitHint.argtypes = [ctypes.c_int,
+                                     ctypes.c_int]
+    def init_hint(hint, value):
+        """
+        Sets the specified init hint to the desired value.
+
+        Wrapper for:
+            void glfwInitHint(int hint, int value);
+        """
+        _glfw.glfwInitHint(hint, value)
+
+
 _glfw.glfwGetVersion.restype = None
 _glfw.glfwGetVersion.argtypes = [ctypes.POINTER(ctypes.c_int),
                                  ctypes.POINTER(ctypes.c_int),
@@ -655,6 +770,22 @@ def get_version_string():
         const char* glfwGetVersionString(void);
     """
     return _glfw.glfwGetVersionString()
+
+
+if hasattr(_glfw, 'glfwGetError'):
+    _glfw.glfwGetError.restype = ctypes.c_int
+    _glfw.glfwGetError.argtypes = [ctypes.POINTER(ctypes.c_char_p)]
+    def get_error():
+        """
+        Returns and clears the last error for the calling thread.
+
+        Wrapper for:
+            int glfwGetError(const char** description);
+        """
+        error_description = (ctypes.c_char_p * 1)()
+        error_code = _glfw.glfwGetError(error_description)
+        return error_code, error_description[0]
+
 
 @_callback_exception_decorator
 def _raise_glfw_errors_as_exceptions(error_code, description):
@@ -737,6 +868,37 @@ def get_monitor_pos(monitor):
     _glfw.glfwGetMonitorPos(monitor, xpos, ypos)
     return xpos_value.value, ypos_value.value
 
+
+if hasattr(_glfw, 'glfwGetMonitorWorkarea'):
+    _glfw.glfwGetMonitorWorkarea.restype = None
+    _glfw.glfwGetMonitorWorkarea.argtypes = [ctypes.POINTER(_GLFWmonitor),
+                                        ctypes.POINTER(ctypes.c_int),
+                                        ctypes.POINTER(ctypes.c_int)]
+
+
+    def get_monitor_workarea(monitor):
+        """
+        Retrives the work area of the monitor.
+
+        Wrapper for:
+            void glfwGetMonitorWorkarea(GLFWmonitor* monitor, int* xpos, int* ypos, int* width, int* height);
+        """
+        xpos_value = ctypes.c_int(0)
+        xpos = ctypes.pointer(xpos_value)
+        ypos_value = ctypes.c_int(0)
+        ypos = ctypes.pointer(ypos_value)
+        width_value = ctypes.c_int(0)
+        width = ctypes.pointer(width_value)
+        height_value = ctypes.c_int(0)
+        height = ctypes.pointer(height_value)
+        _glfw.glfwGetMonitorWorkarea(monitor, xpos, ypos, width, height)
+        return (
+            xpos_value.value,
+            ypos_value.value,
+            width_value.value,
+            height_value.value
+        )
+
 _glfw.glfwGetMonitorPhysicalSize.restype = None
 _glfw.glfwGetMonitorPhysicalSize.argtypes = [ctypes.POINTER(_GLFWmonitor),
                                              ctypes.POINTER(ctypes.c_int),
@@ -755,6 +917,27 @@ def get_monitor_physical_size(monitor):
     _glfw.glfwGetMonitorPhysicalSize(monitor, width, height)
     return width_value.value, height_value.value
 
+
+if hasattr(_glfw, 'glfwGetMonitorContentScale'):
+    _glfw.glfwGetMonitorContentScale.restype = None
+    _glfw.glfwGetMonitorContentScale.argtypes = [ctypes.POINTER(_GLFWmonitor),
+                                                 ctypes.POINTER(ctypes.c_float),
+                                                 ctypes.POINTER(ctypes.c_float)]
+    def get_monitor_content_scale(monitor):
+        """
+        Retrieves the content scale for the specified monitor.
+
+        Wrapper for:
+            void glfwGetMonitorContentScale(GLFWmonitor* monitor, float* xscale, float* yscale);
+        """
+        xscale_value = ctypes.c_int(0)
+        xscale = ctypes.pointer(xscale_value)
+        yscale_value = ctypes.c_int(0)
+        yscale = ctypes.pointer(yscale_value)
+        _glfw.glfwGetMonitorContentScale(monitor, xscale, yscale)
+        return xscale_value.value, yscale_value.value
+
+
 _glfw.glfwGetMonitorName.restype = ctypes.c_char_p
 _glfw.glfwGetMonitorName.argtypes = [ctypes.POINTER(_GLFWmonitor)]
 def get_monitor_name(monitor):
@@ -765,6 +948,56 @@ def get_monitor_name(monitor):
         const char* glfwGetMonitorName(GLFWmonitor* monitor);
     """
     return _glfw.glfwGetMonitorName(monitor)
+
+
+if hasattr(_glfw, 'glfwSetMonitorUserPointer') and hasattr(_glfw, 'glfwGetMonitorUserPointer'):
+    _monitor_user_data_repository = {}
+    _glfw.glfwSetMonitorUserPointer.restype = None
+    _glfw.glfwSetMonitorUserPointer.argtypes = [ctypes.POINTER(_GLFWmonitor),
+                                                ctypes.c_void_p]
+
+
+    def set_monitor_user_pointer(monitor, pointer):
+        """
+        Sets the user pointer of the specified monitor. You may pass a normal
+        python object into this function and it will be wrapped automatically.
+        The object will be kept in existence until the pointer is set to
+        something else.
+
+        Wrapper for:
+            void glfwSetMonitorUserPointer(int jid, void* pointer);
+        """
+
+        data = (False, pointer)
+        if not isinstance(pointer, ctypes.c_void_p):
+            data = (True, pointer)
+            # Create a void pointer for the python object
+            pointer = ctypes.cast(ctypes.pointer(ctypes.py_object(pointer)),
+                                  ctypes.c_void_p)
+
+        _monitor_user_data_repository[monitor] = data
+        _glfw.glfwSetWindowUserPointer(monitor, pointer)
+
+
+    _glfw.glfwGetMonitorUserPointer.restype = ctypes.c_void_p
+    _glfw.glfwGetMonitorUserPointer.argtypes = [ctypes.POINTER(_GLFWmonitor)]
+
+
+    def get_monitor_user_pointer(monitor):
+        """
+        Returns the user pointer of the specified monitor.
+
+        Wrapper for:
+            void* glfwGetMonitorUserPointer(int jid);
+        """
+
+        if monitor in _monitor_user_data_repository:
+            data = _monitor_user_data_repository[monitor]
+            is_wrapped_py_object = data[0]
+            if is_wrapped_py_object:
+                return data[1]
+        return _glfw.glfwGetMonitorUserPointer(monitor)
+
 
 _monitor_callback = None
 _glfw.glfwSetMonitorCallback.restype = _GLFWmonitorfun
@@ -875,6 +1108,21 @@ def window_hint(hint, value):
         void glfwWindowHint(int hint, int value);
     """
     _glfw.glfwWindowHint(hint, value)
+
+
+if hasattr(_glfw, 'glfwWindowHintString'):
+    _glfw.glfwWindowHintString.restype = None
+    _glfw.glfwWindowHintString.argtypes = [ctypes.c_int,
+                                           ctypes.c_char_p]
+    def window_hint_string(hint, value):
+        """
+        Sets the specified window hint to the desired value.
+
+        Wrapper for:
+            void glfwWindowHintString(int hint, const char* value);
+        """
+        _glfw.glfwWindowHintString(hint, _to_char_p(value))
+
 
 _glfw.glfwCreateWindow.restype = ctypes.POINTER(_GLFWwindow)
 _glfw.glfwCreateWindow.argtypes = [ctypes.c_int,
@@ -1025,6 +1273,54 @@ def get_framebuffer_size(window):
     _glfw.glfwGetFramebufferSize(window, width, height)
     return width_value.value, height_value.value
 
+
+if hasattr(_glfw, 'glfwGetWindowContentScale'):
+    _glfw.glfwGetWindowContentScale.restype = None
+    _glfw.glfwGetWindowContentScale.argtypes = [ctypes.POINTER(_GLFWwindow),
+                                                ctypes.POINTER(ctypes.c_float),
+                                                ctypes.POINTER(ctypes.c_float)]
+    def get_window_content_scale(window):
+        """
+        Retrieves the content scale for the specified window.
+
+        Wrapper for:
+            void glfwGetWindowContentScale(GLFWwindow* window, float* xscale, float* yscale);
+        """
+        xscale_value = ctypes.c_int(0)
+        xscale = ctypes.pointer(xscale_value)
+        yscale_value = ctypes.c_int(0)
+        yscale = ctypes.pointer(yscale_value)
+        _glfw.glfwGetWindowContentScale(window, xscale, yscale)
+        return xscale_value.value, yscale_value.value
+
+
+if hasattr(_glfw, 'glfwGetWindowOpacity'):
+    _glfw.glfwGetWindowOpacity.restype = ctypes.c_float
+    _glfw.glfwGetWindowOpacity.argtypes = [ctypes.POINTER(_GLFWwindow)]
+    def get_window_opacity(window):
+        """
+        Returns the opacity of the whole window.
+
+        Wrapper for:
+            float glfwGetWindowOpacity(GLFWwindow* window);
+        """
+        return _glfw.glfwGetWindowOpacity(window)
+
+
+if hasattr(_glfw, 'glfwSetWindowOpacity'):
+    _glfw.glfwSetWindowOpacity.restype = None
+    _glfw.glfwSetWindowOpacity.argtypes = [ctypes.POINTER(_GLFWwindow),
+                                           ctypes.c_float]
+    def set_window_opacity(window, opacity):
+        """
+        Sets the opacity of the whole window.
+
+        Wrapper for:
+            void glfwSetWindowOpacity(GLFWwindow* window, float opacity);
+        """
+        _glfw.glfwSetWindowOpacity(window)
+
+
 _glfw.glfwIconifyWindow.restype = None
 _glfw.glfwIconifyWindow.argtypes = [ctypes.POINTER(_GLFWwindow)]
 def iconify_window(window):
@@ -1069,6 +1365,20 @@ def hide_window(window):
     """
     _glfw.glfwHideWindow(window)
 
+
+if hasattr(_glfw, 'glfwRequestWindowAttention'):
+    _glfw.glfwRequestWindowAttention.restype = None
+    _glfw.glfwRequestWindowAttention.argtypes = [ctypes.POINTER(_GLFWwindow)]
+    def request_window_attention(window):
+        """
+        Requests user attention to the specified window.
+
+        Wrapper for:
+            void glfwRequestWindowAttention(GLFWwindow* window);
+        """
+        _glfw.glfwRequestWindowAttention(window)
+
+
 _glfw.glfwGetWindowMonitor.restype = ctypes.POINTER(_GLFWmonitor)
 _glfw.glfwGetWindowMonitor.argtypes = [ctypes.POINTER(_GLFWwindow)]
 def get_window_monitor(window):
@@ -1091,6 +1401,22 @@ def get_window_attrib(window, attrib):
         int glfwGetWindowAttrib(GLFWwindow* window, int attrib);
     """
     return _glfw.glfwGetWindowAttrib(window, attrib)
+
+
+if hasattr(_glfw, 'glfwSetWindowAttrib'):
+    _glfw.glfwSetWindowAttrib.restype = None
+    _glfw.glfwSetWindowAttrib.argtypes = [ctypes.POINTER(_GLFWwindow),
+                                          ctypes.c_int,
+                                          ctypes.c_int]
+    def set_window_attrib(window, attrib, value):
+        """
+        Returns an attribute of the specified window.
+
+        Wrapper for:
+            void glfwSetWindowAttrib(GLFWwindow* window, int attrib, int value);
+        """
+        _glfw.glfwSetWindowAttrib(window, attrib, value)
+
 
 _window_user_data_repository = {}
 _glfw.glfwSetWindowUserPointer.restype = None
@@ -1299,6 +1625,39 @@ def set_window_iconify_callback(window, cbfun):
     if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
+
+if hasattr(_glfw, 'glfwSetWindowMaximizeCallback'):
+    _window_maximize_callback_repository = {}
+    _callback_repositories.append(_window_maximize_callback_repository)
+    _glfw.glfwSetWindowMaximizeCallback.restype = _GLFWwindowmaximizefun
+    _glfw.glfwSetWindowMaximizeCallback.argtypes = [
+        ctypes.POINTER(_GLFWwindow),
+        _GLFWwindowmaximizefun
+    ]
+    def set_window_maximize_callback(window, cbfun):
+        """
+        Sets the maximize callback for the specified window.
+
+        Wrapper for:
+            GLFWwindowmaximizefun glfwSetWindowMaximizeCallback(GLFWwindow* window, GLFWwindowmaximizefun cbfun);
+        """
+        window_addr = ctypes.cast(ctypes.pointer(window),
+                                  ctypes.POINTER(ctypes.c_long)).contents.value
+        if window_addr in _window_maximize_callback_repository:
+            previous_callback = _window_maximize_callback_repository[
+                window_addr]
+        else:
+            previous_callback = None
+        if cbfun is None:
+            cbfun = 0
+        c_cbfun = _GLFWwindowmaximizefun(cbfun)
+        _window_maximize_callback_repository[window_addr] = (cbfun, c_cbfun)
+        cbfun = c_cbfun
+        _glfw.glfwSetWindowMaximizeCallback(window, cbfun)
+        if previous_callback is not None and previous_callback[0] != 0:
+            return previous_callback[0]
+
+
 _framebuffer_size_callback_repository = {}
 _callback_repositories.append(_framebuffer_size_callback_repository)
 _glfw.glfwSetFramebufferSizeCallback.restype = _GLFWframebuffersizefun
@@ -1325,6 +1684,40 @@ def set_framebuffer_size_callback(window, cbfun):
     _glfw.glfwSetFramebufferSizeCallback(window, cbfun)
     if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
+
+
+if hasattr(_glfw, 'glfwSetWindowContentScaleCallback'):
+    _window_content_scale_callback_repository = {}
+    _callback_repositories.append(_window_content_scale_callback_repository)
+    _glfw.glfwSetWindowContentScaleCallback.restype = _GLFWwindowcontentscalefun
+    _glfw.glfwSetWindowContentScaleCallback.argtypes = [
+        ctypes.POINTER(_GLFWwindow),
+        _GLFWwindowcontentscalefun]
+
+
+    def set_window_content_scale_callback(window, cbfun):
+        """
+        Sets the window content scale callback for the specified window.
+
+        Wrapper for:
+            GLFWwindowcontentscalefun glfwSetWindowContentScaleCallback(GLFWwindow* window, GLFWwindowcontentscalefun cbfun);
+        """
+        window_addr = ctypes.cast(ctypes.pointer(window),
+                                  ctypes.POINTER(ctypes.c_long)).contents.value
+        if window_addr in _window_content_scale_callback_repository:
+            previous_callback = _window_content_scale_callback_repository[
+                window_addr]
+        else:
+            previous_callback = None
+        if cbfun is None:
+            cbfun = 0
+        c_cbfun = _GLFWwindowcontentscalefun(cbfun)
+        _window_content_scale_callback_repository[window_addr] = (cbfun, c_cbfun)
+        cbfun = c_cbfun
+        _glfw.glfwSetWindowContentScaleCallback(window, cbfun)
+        if previous_callback is not None and previous_callback[0] != 0:
+            return previous_callback[0]
+
 
 _glfw.glfwPollEvents.restype = None
 _glfw.glfwPollEvents.argtypes = []
@@ -1376,6 +1769,20 @@ def set_input_mode(window, mode, value):
         void glfwSetInputMode(GLFWwindow* window, int mode, int value);
     """
     _glfw.glfwSetInputMode(window, mode, value)
+
+
+if hasattr(_glfw, 'glfwRawMouseMotionSupported'):
+    _glfw.glfwRawMouseMotionSupported.restype = ctypes.c_int
+    _glfw.glfwRawMouseMotionSupported.argtypes = []
+    def raw_mouse_motion_supported():
+        """
+        Returns whether raw mouse motion is supported.
+
+        Wrapper for:
+            int glfwRawMouseMotionSupported(void);
+        """
+        return _glfw.glfwRawMouseMotionSupported() != 0
+
 
 _glfw.glfwGetKey.restype = ctypes.c_int
 _glfw.glfwGetKey.argtypes = [ctypes.POINTER(_GLFWwindow),
@@ -1638,6 +2045,24 @@ def get_joystick_buttons(joy):
     result = _glfw.glfwGetJoystickButtons(joy, count)
     return result, count_value.value
 
+
+if hasattr(_glfw, 'glfwGetJoystickHats'):
+    _glfw.glfwGetJoystickHats.restype = ctypes.POINTER(ctypes.c_ubyte)
+    _glfw.glfwGetJoystickHats.argtypes = [ctypes.c_int,
+                                             ctypes.POINTER(ctypes.c_int)]
+    def get_joystick_hats(joystick_id):
+        """
+        Returns the state of all hats of the specified joystick.
+
+        Wrapper for:
+            const unsigned char* glfwGetJoystickButtons(int joy, int* count);
+        """
+        count_value = ctypes.c_int(0)
+        count = ctypes.pointer(count_value)
+        result = _glfw.glfwGetJoystickHats(joystick_id, count)
+        return result, count_value.value
+
+
 _glfw.glfwGetJoystickName.restype = ctypes.c_char_p
 _glfw.glfwGetJoystickName.argtypes = [ctypes.c_int]
 def get_joystick_name(joy):
@@ -1648,6 +2073,98 @@ def get_joystick_name(joy):
         const char* glfwGetJoystickName(int joy);
     """
     return _glfw.glfwGetJoystickName(joy)
+
+
+if hasattr(_glfw, 'glfwGetJoystickGUID'):
+    _glfw.glfwGetJoystickGUID.restype = ctypes.c_char_p
+    _glfw.glfwGetJoystickGUID.argtypes = [ctypes.c_int]
+    def get_joystick_guid(joystick_id):
+        """
+        Returns the SDL compatible GUID of the specified joystick.
+
+        Wrapper for:
+            const char* glfwGetJoystickGUID(int jid);
+        """
+        return _glfw.glfwGetJoystickGUID(joystick_id)
+
+if hasattr(_glfw, 'glfwSetJoystickUserPointer') and hasattr(_glfw, 'glfwGetJoystickUserPointer'):
+    _joystick_user_data_repository = {}
+    _glfw.glfwSetJoystickUserPointer.restype = None
+    _glfw.glfwSetJoystickUserPointer.argtypes = [ctypes.c_int,
+                                               ctypes.c_void_p]
+
+
+    def set_joystick_user_pointer(joystick_id, pointer):
+        """
+        Sets the user pointer of the specified joystick. You may pass a normal
+        python object into this function and it will be wrapped automatically.
+        The object will be kept in existence until the pointer is set to
+        something else.
+
+        Wrapper for:
+            void glfwSetJoystickUserPointer(int jid, void* pointer);
+        """
+
+        data = (False, pointer)
+        if not isinstance(pointer, ctypes.c_void_p):
+            data = (True, pointer)
+            # Create a void pointer for the python object
+            pointer = ctypes.cast(ctypes.pointer(ctypes.py_object(pointer)),
+                                  ctypes.c_void_p)
+
+        _joystick_user_data_repository[joystick_id] = data
+        _glfw.glfwSetWindowUserPointer(joystick_id, pointer)
+
+
+    _glfw.glfwGetJoystickUserPointer.restype = ctypes.c_void_p
+    _glfw.glfwGetJoystickUserPointer.argtypes = [ctypes.c_int]
+
+
+    def get_joystick_user_pointer(joystick_id):
+        """
+        Returns the user pointer of the specified joystick.
+
+        Wrapper for:
+            void* glfwGetJoystickUserPointer(int jid);
+        """
+
+        if joystick_id in _joystick_user_data_repository:
+            data = _joystick_user_data_repository[joystick_id]
+            is_wrapped_py_object = data[0]
+            if is_wrapped_py_object:
+                return data[1]
+        return _glfw.glfwGetJoystickUserPointer(joystick_id)
+
+
+if hasattr(_glfw, 'glfwJoystickIsGamepad'):
+    _glfw.glfwJoystickIsGamepad.restype = ctypes.c_int
+    _glfw.glfwJoystickIsGamepad.argtypes = [ctypes.c_int]
+    def joystick_is_gamepad(joystick_id):
+        """
+        Returns whether the specified joystick has a gamepad mapping.
+
+        Wrapper for:
+            int glfwJoystickIsGamepad(int jid);
+        """
+        return _glfw.glfwJoystickIsGamepad(joystick_id) != 0
+
+
+if hasattr(_glfw, 'glfwGetGamepadState'):
+    _glfw.glfwGetGamepadState.restype = ctypes.c_int
+    _glfw.glfwGetGamepadState.argtypes = [ctypes.c_int,
+                                          ctypes.POINTER(_GLFWgamepadstate)]
+    def get_gamepad_state(joystick_id):
+        """
+        Retrieves the state of the specified joystick remapped as a gamepad.
+
+        Wrapper for:
+            int glfwGetGamepadState(int jid, GLFWgamepadstate* state);
+        """
+        gamepad_state = _GLFWgamepadstate()
+        if _glfw.glfwGetGamepadState(joystick_id, ctypes.byref(gamepad_state)) == FALSE:
+            return None
+        return gamepad_state.unwrap()
+
 
 _glfw.glfwSetClipboardString.restype = None
 _glfw.glfwSetClipboardString.argtypes = [ctypes.POINTER(_GLFWwindow),
@@ -1899,6 +2416,36 @@ if hasattr(_glfw, 'glfwSetJoystickCallback'):
         if previous_callback is not None and previous_callback[0] != 0:
             return previous_callback[0]
 
+
+if hasattr(_glfw, 'glfwUpdateGamepadMappings'):
+    _glfw.glfwUpdateGamepadMappings.restype = ctypes.c_int
+    _glfw.glfwUpdateGamepadMappings.argtypes = [ctypes.c_char_p]
+    def update_gamepad_mappings(string):
+        """
+        Adds the specified SDL_GameControllerDB gamepad mappings.
+
+        Wrapper for:
+            int glfwUpdateGamepadMappings(const char* string);
+        """
+        return _glfw.glfwUpdateGamepadMappings(_to_char_p(string))
+
+
+if hasattr(_glfw, 'glfwGetGamepadName'):
+    _glfw.glfwGetGamepadName.restype = ctypes.c_char_p
+    _glfw.glfwGetGamepadName.argtypes = [ctypes.c_int]
+    def get_gamepad_name(joystick_id):
+        """
+        Returns the human-readable gamepad name for the specified joystick.
+
+        Wrapper for:
+            const char* glfwGetGamepadName(int jid);
+        """
+        gamepad_name = _glfw.glfwGetGamepadName(joystick_id)
+        if gamepad_name:
+            return gamepad_name.decode('utf-8')
+        return None
+
+
 if hasattr(_glfw, 'glfwGetKeyName'):
     _glfw.glfwGetKeyName.restype = ctypes.c_char_p
     _glfw.glfwGetKeyName.argtypes = [ctypes.c_int, ctypes.c_int]
@@ -1913,6 +2460,20 @@ if hasattr(_glfw, 'glfwGetKeyName'):
         if key_name:
             return key_name.decode('utf-8')
         return None
+
+
+if hasattr(_glfw, 'glfwGetKeyScancode'):
+    _glfw.glfwGetKeyScancode.restype = ctypes.c_int
+    _glfw.glfwGetKeyScancode.argtypes = [ctypes.c_int]
+    def get_key_scancode(key):
+        """
+        Returns the platform-specific scancode of the specified key.
+
+        Wrapper for:
+            int glfwGetKeyScancode(int key);
+        """
+        return _glfw.glfwGetKeyScancode(key)
+
 
 if hasattr(_glfw, 'glfwCreateCursor'):
     _glfw.glfwCreateCursor.restype = ctypes.POINTER(_GLFWcursor)
@@ -2072,7 +2633,7 @@ if hasattr(_glfw, 'glfwGetWindowFrameSize'):
                                              ctypes.POINTER(ctypes.c_int),
                                              ctypes.POINTER(ctypes.c_int),
                                              ctypes.POINTER(ctypes.c_int)]
-    def set_get_window_frame_size(window):
+    def get_window_frame_size(window):
         """
         Retrieves the size of the frame of the window.
 

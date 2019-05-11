@@ -18,7 +18,10 @@ for pythonic_name in sorted(dir(glfw)):
         continue
     obj = getattr(glfw, pythonic_name)
     if isinstance(obj, function_type):
-        cstyle_name = 'glfw' + ''.join(word.title() for word in pythonic_name.split('_'))
+        if pythonic_name == 'get_joystick_guid':
+            cstyle_name = 'glfwGetJoystickGUID'
+        else:
+            cstyle_name = 'glfw' + ''.join(word.title() for word in pythonic_name.split('_'))
         function_names[pythonic_name] = cstyle_name
     elif isinstance(obj, constant_type):
         cstyle_name = 'GLFW_' + pythonic_name
