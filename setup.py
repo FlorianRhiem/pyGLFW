@@ -8,7 +8,7 @@ with open(os.path.join(setup_directory, 'README.rst')) as readme_file:
 
 setup(
     name='glfw',
-    version='1.8.0',
+    version='1.8.1',
     description='A ctypes-based wrapper for GLFW3.',
     long_description=long_description,
     url='https://github.com/FlorianRhiem/pyGLFW',

@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [1.8.1] - 2019-05-21
+- Added the changelog back to the source distribution
 
 ## [1.8.0] - 2019-05-11
 - Update for GLFW 3.3
