@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [1.8.2] - 2019-07-06
+- Added the sys.prefix/lib to the search path
+
 ## [1.8.1] - 2019-05-21
 - Added the changelog back to the source distribution
 
