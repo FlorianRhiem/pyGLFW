@@ -127,12 +127,13 @@ def _get_library_search_paths():
     """
     search_paths = [
         '',
+        os.path.abspath(os.path.dirname(__file__)),
+        sys.prefix + '/lib',
         '/usr/lib64',
         '/usr/local/lib64',
         '/usr/lib', '/usr/local/lib',
         '/run/current-system/sw/lib',
-        '/usr/lib/x86_64-linux-gnu/',
-        os.path.abspath(os.path.dirname(__file__))
+        '/usr/lib/x86_64-linux-gnu/'
     ]
 
     if sys.platform == 'darwin':
