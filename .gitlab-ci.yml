@@ -3,7 +3,7 @@ packages:
   script:
   - apt-get update -qy
   - apt-get install -y curl python3-setuptools python3-wheel unzip
-  - GLFW_VERSION=3.2.1
+  - GLFW_VERSION=3.3
   # Build source distribution
   - python3 setup.py sdist
   # Build wheel for Windows x86
