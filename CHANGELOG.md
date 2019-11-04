@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [1.8.4] - 2019-11-04
+- Fix pointer types in get_window_content_scale
+
 ## [1.8.3] - 2019-08-22
 - Updated the GLFW version in the wheels to 3.3
 

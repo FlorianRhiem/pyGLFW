@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
 __copyright__ = 'Copyright (c) 2013-2019 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '1.8.3'
+__version__ = '1.8.4'
 
 # By default (ERROR_REPORTING = True), GLFW errors will be reported as Python
 # exceptions. Set ERROR_REPORTING to False or set a curstom error callback to
