@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [1.8.5] - 2019-11-28
+- Added /usr/lib/aarch64-linux-gnu/ to library search paths
+
 ## [1.8.4] - 2019-11-04
 - Fix pointer types in get_window_content_scale
 
