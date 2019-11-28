@@ -133,7 +133,8 @@ def _get_library_search_paths():
         '/usr/local/lib64',
         '/usr/lib', '/usr/local/lib',
         '/run/current-system/sw/lib',
-        '/usr/lib/x86_64-linux-gnu/'
+        '/usr/lib/x86_64-linux-gnu/',
+        '/usr/lib/aarch64-linux-gnu/',
     ]
 
     if sys.platform == 'darwin':
