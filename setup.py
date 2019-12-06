@@ -29,6 +29,6 @@ setup(
     packages=['glfw'],
     package_data={
         # include GLFW shared library in wheel package
-        'glfw': ['glfw3.dll']
+        'glfw': ['glfw3.dll', 'libglfw.3.dylib']
     }
 )
