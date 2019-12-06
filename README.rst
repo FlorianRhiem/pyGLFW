@@ -41,15 +41,25 @@ The GLFW shared library is included in the Python wheels for Windows, but the co
 
 Alternatively, you can download a shared library built for a runtime already installed on your system from `glfw.org <http://www.glfw.org/download.html>`_.
 
-Linux and macOS
-~~~~~~~~~~~~~~~
+macOS
+~~~~~
+
+The GLFW shared library for 64-bit is included in the Python wheels for macOS.
+
+If you are using a 32-bit Python installation or otherwise cannot use the
+library downloaded with the wheel, please follow the steps for Linux below, to
+build and install GLFW yourself, then place it in one of the library search
+paths or set ``PYGLFW_LIBRARY`` to the location of the library.
+
+Linux
+~~~~~
 
 You will need to install the GLFW shared library yourself and should
 `compile GLFW from source <http://www.glfw.org/docs/latest/compile.html>`__
 (use ``-DBUILD_SHARED_LIBS=ON``).
 
 pyGLFW will search for the library in a list of search paths (including those
-in ``LD_LIBRARY_PATH`` on Linux and ``DYLD_LIBRARY_PATH`` on macOS). If you
+in ``LD_LIBRARY_PATH``). If you
 want to use a specific library, you can set the ``PYGLFW_LIBRARY`` environment
 variable to its path.
 
