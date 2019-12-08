@@ -10,14 +10,16 @@ packages:
   - curl -L -o glfw.bin.zip https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.bin.WIN32.zip
   - unzip glfw.bin.zip -d glfw.bin
   - cp glfw.bin/*/lib-vc2010/glfw3.dll glfw/glfw3.dll
+  - cp vcredist/msvcr100.dll glfw/msvcr100.dll
   - python3 setup.py bdist_wheel --python-tag py2.py3 --plat-name win32
-  - rm -rf glfw.bin.zip glfw.bin glfw/glfw3.dll build
+  - rm -rf glfw.bin.zip glfw.bin glfw/glfw3.dll glfw/msvcr100.dll build
   # Build wheel for Windows x86_64
   - curl -L -o glfw.bin.zip https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.bin.WIN64.zip
   - unzip glfw.bin.zip -d glfw.bin
   - cp glfw.bin/*/lib-vc2012/glfw3.dll glfw/glfw3.dll
+  - cp vcredist/msvcr110.dll glfw/msvcr110.dll
   - python3 setup.py bdist_wheel --python-tag py2.py3 --plat-name win_amd64
-  - rm -rf glfw.bin.zip glfw.bin glfw/glfw3.dll build
+  - rm -rf glfw.bin.zip glfw.bin glfw/glfw3.dll glfw/msvcr110.dll build
   # Build wheel for macOS x86_64
   - curl -L -o glfw.bin.zip https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.bin.MACOS.zip
   - unzip glfw.bin.zip -d glfw.bin

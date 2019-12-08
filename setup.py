@@ -28,7 +28,12 @@ setup(
     ],
     packages=['glfw'],
     package_data={
-        # include GLFW shared library in wheel package
-        'glfw': ['glfw3.dll', 'libglfw.3.dylib']
+        # include GLFW shared library and Visual C++ runtimes in wheel package
+        'glfw': [
+            'glfw3.dll',
+            'libglfw.3.dylib',
+            'msvcr100.dll',
+            'msvcr110.dll',
+        ]
     }
 )

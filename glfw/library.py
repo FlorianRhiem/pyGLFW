@@ -158,6 +158,12 @@ elif sys.platform == 'win32':
     except OSError:
         # try glfw3.dll in package directory
         try:
+            if sys.maxsize > 2**32:
+                # load Microsoft Visual C++ 2012 runtime on 64-bit systems
+                msvcr = ctypes.CDLL(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'msvcr110.dll'))
+            else:
+                # load Microsoft Visual C++ 2010 runtime on 32-bit systems
+                msvcr = ctypes.CDLL(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'msvcr100.dll'))
             glfw = ctypes.CDLL(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'glfw3.dll'))
         except OSError:
             glfw = None

@@ -4,6 +4,7 @@
 !.gitlab-ci.yml
 *.dll
 *.dylib
+!vcredist/*.dll
 
 # Packages
 *.egg

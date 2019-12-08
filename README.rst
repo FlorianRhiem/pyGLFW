@@ -34,12 +34,9 @@ pyGLFW can be installed using pip:
 Windows
 ~~~~~~~
 
-The GLFW shared library is included in the Python wheels for Windows, but the correct Microsoft Visual C++ Redistributable will be required:
+The GLFW shared library and Visual C++ runtime are included in the Python wheels.
 
-- `VC 2010 <https://www.microsoft.com/en-us/download/details.aspx?id=5555>`_ for 32-bit Python, or
-- `VC 2012 <https://www.microsoft.com/en-us/download/details.aspx?id=30679>`_ for 64-bit Python.
-
-Alternatively, you can download a shared library built for a runtime already installed on your system from `glfw.org <http://www.glfw.org/download.html>`_.
+To use a different GLFW library, you can set ``PYGLFW_LIBRARY`` to its location.
 
 macOS
 ~~~~~
