@@ -930,9 +930,9 @@ if hasattr(_glfw, 'glfwGetMonitorContentScale'):
         Wrapper for:
             void glfwGetMonitorContentScale(GLFWmonitor* monitor, float* xscale, float* yscale);
         """
-        xscale_value = ctypes.c_int(0)
+        xscale_value = ctypes.c_float(0)
         xscale = ctypes.pointer(xscale_value)
-        yscale_value = ctypes.c_int(0)
+        yscale_value = ctypes.c_float(0)
         yscale = ctypes.pointer(yscale_value)
         _glfw.glfwGetMonitorContentScale(monitor, xscale, yscale)
         return xscale_value.value, yscale_value.value
