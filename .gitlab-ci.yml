@@ -1,4 +1,56 @@
+stages:
+- build
+- package
+
+build-manylinux2010-x86_64:
+  stage: build
+  image: quay.io/pypa/manylinux2010_x86_64
+  script:
+  # Download GLFW from source
+  - curl -LO https://github.com/glfw/glfw/releases/download/3.3/glfw-3.3.zip
+  - unzip glfw-3.3.zip
+  # Install build dependencies
+  - yum install -y libXinerama-devel libXrandr-devel libXcursor-devel libXi-devel
+  - curl -LO https://github.com/Kitware/CMake/releases/download/v3.1.3/cmake-3.1.3-Linux-x86_64.tar.gz
+  - tar xzf cmake-3.1.3-Linux-x86_64.tar.gz
+  - mv cmake-3.1.3-Linux-x86_64 cmake
+  # Build GLFW
+  - mkdir build
+  - cd build
+  - ../cmake/bin/cmake ../glfw-3.3 -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF
+  - make
+  - mkdir ../artifacts-manylinux2010-x86_64
+  - cp src/libglfw.so ../artifacts-manylinux2010-x86_64/libglfw.so
+  artifacts:
+    paths:
+    - artifacts-manylinux2010-x86_64
+
+build-manylinux2010-i686:
+  stage: build
+  image: quay.io/pypa/manylinux2010_i686
+  script:
+  # Download GLFW from source
+  - curl -LO https://github.com/glfw/glfw/releases/download/3.3/glfw-3.3.zip
+  - unzip glfw-3.3.zip
+  # Install build dependencies
+  - yum install -y libXinerama-devel libXrandr-devel libXcursor-devel libXi-devel ncompress
+  - curl -LO https://github.com/Kitware/CMake/releases/download/v3.1.3/cmake-3.1.3-Linux-i386.tar.Z
+  - uncompress cmake-3.1.3-Linux-i386.tar.Z
+  - tar xf cmake-3.1.3-Linux-i386.tar
+  - mv cmake-3.1.3-Linux-i386 cmake
+  # Build GLFW
+  - mkdir build
+  - cd build
+  - ../cmake/bin/cmake ../glfw-3.3 -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF
+  - make
+  - mkdir ../artifacts-manylinux2010-i686
+  - cp src/libglfw.so ../artifacts-manylinux2010-i686/libglfw.so
+  artifacts:
+    paths:
+    - artifacts-manylinux2010-i686
+
 packages:
+  stage: package
   image: ubuntu:latest
   script:
   - apt-get update -qy
@@ -26,6 +78,14 @@ packages:
   - cp glfw.bin/*/lib-macos/libglfw.3.dylib glfw/libglfw.3.dylib
   - python3 setup.py bdist_wheel --python-tag py2.py3 --plat-name macosx_10.6_intel
   - rm -rf glfw.bin.zip glfw.bin glfw/libglfw.3.dylib build
+  # Build wheel for manylinux2010 x86
+  - cp artifacts-manylinux2010-i686/libglfw.so glfw/libglfw.so
+  - python3 setup.py bdist_wheel --python-tag py2.py3 --plat-name manylinux2010_i686
+  - rm -rf glfw/libglfw.so build
+  # Build wheel for manylinux2010 x86_64
+  - cp artifacts-manylinux2010-x86_64/libglfw.so glfw/libglfw.so
+  - python3 setup.py bdist_wheel --python-tag py2.py3 --plat-name manylinux2010_x86_64
+  - rm -rf glfw/libglfw.so build
   artifacts:
     paths:
     - dist/

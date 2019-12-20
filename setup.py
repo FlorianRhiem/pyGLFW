@@ -32,6 +32,7 @@ setup(
         'glfw': [
             'glfw3.dll',
             'libglfw.3.dylib',
+            'libglfw.so',
             'msvcr100.dll',
             'msvcr110.dll',
         ]
