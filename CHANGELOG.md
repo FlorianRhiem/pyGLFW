@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [1.9.0] - 2019-12-30
+- Added wrappers for native functions
+
 ## [1.8.7] - 2019-12-10
 - Fixed glfwGetMonitorContentScale
 
