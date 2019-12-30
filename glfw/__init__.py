@@ -2719,4 +2719,348 @@ if hasattr(_glfw, 'glfwPostEmptyEvent'):
         """
         _glfw.glfwPostEmptyEvent()
 
+
+if hasattr(_glfw, 'glfwGetWin32Adapter'):
+    _glfw.glfwGetWin32Adapter.restype = ctypes.c_char_p
+    _glfw.glfwGetWin32Adapter.argtypes = [ctypes.POINTER(_GLFWmonitor)]
+    def get_win32_adapter(monitor):
+        """
+        Returns the adapter device name of the specified monitor.
+
+        Wrapper for:
+            const char* glfwGetWin32Adapter(GLFWmonitor* monitor);
+        """
+        adapter_name = _glfw.glfwGetWin32Adapter(monitor)
+        if adapter_name:
+            return adapter_name.decode('utf-8')
+        return None
+
+
+if hasattr(_glfw, 'glfwGetWin32Monitor'):
+    _glfw.glfwGetWin32Monitor.restype = ctypes.c_char_p
+    _glfw.glfwGetWin32Monitor.argtypes = [ctypes.POINTER(_GLFWmonitor)]
+    def get_win32_monitor(monitor):
+        """
+        Returns the display device name of the specified monitor.
+
+        Wrapper for:
+            const char* glfwGetWin32Monitor(GLFWmonitor* monitor);
+        """
+        monitor_name = _glfw.glfwGetWin32Monitor(monitor)
+        if monitor_name:
+            return monitor_name.decode('utf-8')
+        return None
+
+
+if hasattr(_glfw, 'glfwGetWin32Window'):
+    _glfw.glfwGetWin32Window.restype = ctypes.c_void_p
+    _glfw.glfwGetWin32Window.argtypes = [ctypes.POINTER(_GLFWwindow)]
+    def get_win32_window(window):
+        """
+        Returns the HWND of the specified window.
+
+        Wrapper for:
+            HWND glfwGetWin32Window(GLFWwindow* window);
+        """
+        return _glfw.glfwGetWin32Window(window)
+
+
+if hasattr(_glfw, 'glfwGetWGLContext'):
+    _glfw.glfwGetWGLContext.restype = ctypes.c_void_p
+    _glfw.glfwGetWGLContext.argtypes = [ctypes.POINTER(_GLFWwindow)]
+    def get_wgl_context(window):
+        """
+        Returns the HGLRC of the specified window.
+
+        Wrapper for:
+            HGLRC glfwGetWGLContext(GLFWwindow* window);
+        """
+        return _glfw.glfwGetWGLContext(window)
+
+
+if hasattr(_glfw, 'glfwGetCocoaMonitor'):
+    _glfw.glfwGetCocoaMonitor.restype = ctypes.c_uint32
+    _glfw.glfwGetCocoaMonitor.argtypes = [ctypes.POINTER(_GLFWmonitor)]
+    def get_cocoa_monitor(monitor):
+        """
+        Returns the CGDirectDisplayID of the specified monitor.
+
+        Wrapper for:
+            CGDirectDisplayID glfwGetCocoaMonitor(GLFWmonitor* monitor);
+        """
+        return _glfw.glfwGetCocoaMonitor(monitor)
+
+
+if hasattr(_glfw, 'glfwGetCocoaWindow'):
+    _glfw.glfwGetCocoaWindow.restype = ctypes.c_void_p
+    _glfw.glfwGetCocoaWindow.argtypes = [ctypes.POINTER(_GLFWwindow)]
+    def get_cocoa_window(window):
+        """
+        Returns the NSWindow of the specified window.
+
+        Wrapper for:
+            id glfwGetCocoaWindow(GLFWwindow* window);
+        """
+        return _glfw.glfwGetCocoaWindow(window)
+
+
+if hasattr(_glfw, 'glfwGetNSGLContext'):
+    _glfw.glfwGetNSGLContext.restype = ctypes.c_void_p
+    _glfw.glfwGetNSGLContext.argtypes = [ctypes.POINTER(_GLFWwindow)]
+    def get_nsgl_context(window):
+        """
+        Returns the NSOpenGLContext of the specified window.
+
+        Wrapper for:
+            id glfwGetNSGLContext(GLFWwindow* window);
+        """
+        return _glfw.glfwGetNSGLContext(window)
+
+
+if hasattr(_glfw, 'glfwGetX11Display'):
+    _glfw.glfwGetX11Display.restype = ctypes.c_void_p
+    _glfw.glfwGetX11Display.argtypes = []
+    def get_x11_display():
+        """
+        Returns the Display used by GLFW.
+
+        Wrapper for:
+            Display* glfwGetX11Display(void);
+        """
+        return _glfw.glfwGetX11Display()
+
+
+if hasattr(_glfw, 'glfwGetX11Adapter'):
+    _glfw.glfwGetX11Adapter.restype = ctypes.c_uint32
+    _glfw.glfwGetX11Adapter.argtypes = [ctypes.POINTER(_GLFWmonitor)]
+    def get_x11_adapter(monitor):
+        """
+        Returns the RRCrtc of the specified monitor.
+
+        Wrapper for:
+            RRCrtc glfwGetX11Adapter(GLFWmonitor* monitor);
+        """
+        return _glfw.glfwGetX11Adapter(monitor)
+
+
+if hasattr(_glfw, 'glfwGetX11Monitor'):
+    _glfw.glfwGetX11Monitor.restype = ctypes.c_uint32
+    _glfw.glfwGetX11Monitor.argtypes = [ctypes.POINTER(_GLFWmonitor)]
+    def get_x11_monitor(monitor):
+        """
+        Returns the RROutput of the specified monitor.
+
+        Wrapper for:
+            RROutput glfwGetX11Monitor(GLFWmonitor* monitor);
+        """
+        return _glfw.glfwGetX11Monitor(monitor)
+
+
+if hasattr(_glfw, 'glfwGetX11Window'):
+    _glfw.glfwGetX11Window.restype = ctypes.c_uint32
+    _glfw.glfwGetX11Window.argtypes = [ctypes.POINTER(_GLFWwindow)]
+    def get_x11_window(window):
+        """
+        Returns the Window of the specified window.
+
+        Wrapper for:
+            Window glfwGetX11Window(GLFWwindow* window);
+        """
+        return _glfw.glfwGetX11Window(window)
+
+
+if hasattr(_glfw, 'glfwSetX11SelectionString'):
+    _glfw.glfwSetX11SelectionString.restype = None
+    _glfw.glfwSetX11SelectionString.argtypes = [ctypes.c_char_p]
+    def set_x11_selection_string(string):
+        """
+        Sets the current primary selection to the specified string.
+
+        Wrapper for:
+            void glfwSetX11SelectionString(const char* string);
+        """
+        binary_string = string.encode('utf-8')
+        _glfw.glfwSetX11SelectionString(binary_string)
+
+
+if hasattr(_glfw, 'glfwGetX11SelectionString'):
+    _glfw.glfwGetX11SelectionString.restype = ctypes.c_char_p
+    _glfw.glfwGetX11SelectionString.argtypes = []
+    def get_x11_selection_string():
+        """
+        Returns the contents of the current primary selection as a string.
+
+        Wrapper for:
+            const char* glfwGetX11SelectionString(void);
+        """
+        selection_string = _glfw.glfwGetX11SelectionString()
+        if selection_string:
+            return selection_string.decode('utf-8')
+        return None
+
+
+if hasattr(_glfw, 'glfwGetGLXContext'):
+    _glfw.glfwGetGLXContext.restype = ctypes.c_void_p
+    _glfw.glfwGetGLXContext.argtypes = [ctypes.POINTER(_GLFWwindow)]
+    def get_glx_context(window):
+        """
+        Returns the GLXContext of the specified window.
+
+        Wrapper for:
+            GLXContext glfwGetGLXContext(GLFWwindow* window);
+        """
+        return _glfw.glfwGetGLXContext(window)
+
+
+if hasattr(_glfw, 'glfwGetGLXWindow'):
+    _glfw.glfwGetGLXWindow.restype = ctypes.c_uint32
+    _glfw.glfwGetGLXWindow.argtypes = [ctypes.POINTER(_GLFWwindow)]
+    def get_glx_window(window):
+        """
+        Returns the GLXWindow of the specified window.
+
+        Wrapper for:
+            GLXWindow glfwGetGLXWindow(GLFWwindow* window);
+        """
+        return _glfw.glfwGetGLXWindow(window)
+
+
+if hasattr(_glfw, 'glfwGetWaylandDisplay'):
+    _glfw.glfwGetWaylandDisplay.restype = ctypes.c_void_p
+    _glfw.glfwGetWaylandDisplay.argtypes = []
+    def get_wayland_display():
+        """
+        Returns the struct wl_display* used by GLFW.
+
+        Wrapper for:
+            struct wl_display* glfwGetWaylandDisplay(void);
+        """
+        return _glfw.glfwGetWaylandDisplay()
+
+
+if hasattr(_glfw, 'glfwGetWaylandMonitor'):
+    _glfw.glfwGetWaylandMonitor.restype = ctypes.c_void_p
+    _glfw.glfwGetWaylandMonitor.argtypes = [ctypes.POINTER(_GLFWmonitor)]
+    def get_wayland_monitor(monitor):
+        """
+        Returns the struct wl_output* of the specified monitor.
+
+        Wrapper for:
+            struct wl_output* glfwGetWaylandMonitor(GLFWmonitor* monitor);
+        """
+        return _glfw.glfwGetWaylandMonitor(monitor)
+
+
+if hasattr(_glfw, 'glfwGetWaylandWindow'):
+    _glfw.glfwGetWaylandWindow.restype = ctypes.c_void_p
+    _glfw.glfwGetWaylandWindow.argtypes = [ctypes.POINTER(_GLFWwindow)]
+    def get_wayland_window(window):
+        """
+        Returns the main struct wl_surface* of the specified window.
+
+        Wrapper for:
+            struct wl_surface* glfwGetWaylandWindow(GLFWwindow* window);
+        """
+        return _glfw.glfwGetWaylandWindow(window)
+
+
+if hasattr(_glfw, 'glfwGetEGLDisplay'):
+    _glfw.glfwGetEGLDisplay.restype = ctypes.c_void_p
+    _glfw.glfwGetEGLDisplay.argtypes = []
+    def get_egl_display():
+        """
+        Returns the EGLDisplay used by GLFW.
+
+        Wrapper for:
+            EGLDisplay glfwGetEGLDisplay(void);
+        """
+        return _glfw.glfwGetEGLDisplay()
+
+
+if hasattr(_glfw, 'glfwGetEGLContext'):
+    _glfw.glfwGetEGLContext.restype = ctypes.c_void_p
+    _glfw.glfwGetEGLContext.argtypes = [ctypes.POINTER(_GLFWwindow)]
+    def get_egl_context(window):
+        """
+        Returns the EGLContext of the specified window.
+
+        Wrapper for:
+            EGLContext glfwGetEGLContext(GLFWwindow* window);
+        """
+        return _glfw.glfwGetEGLContext(window)
+
+
+if hasattr(_glfw, 'glfwGetEGLSurface'):
+    _glfw.glfwGetEGLSurface.restype = ctypes.c_void_p
+    _glfw.glfwGetEGLSurface.argtypes = [ctypes.POINTER(_GLFWwindow)]
+    def get_egl_surface(window):
+        """
+        Returns the EGLSurface of the specified window.
+
+        Wrapper for:
+            EGLSurface glfwGetEGLSurface(GLFWwindow* window);
+        """
+        return _glfw.glfwGetEGLSurface(window)
+
+
+if hasattr(_glfw, 'glfwGetOSMesaColorBuffer'):
+    _glfw.glfwGetOSMesaColorBuffer.restype = ctypes.c_int
+    _glfw.glfwGetOSMesaColorBuffer.argtypes = [ctypes.POINTER(_GLFWwindow), ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_void_p)]
+    def get_os_mesa_color_buffer(window):
+        """
+        Retrieves the color buffer associated with the specified window.
+
+        Wrapper for:
+            int glfwGetOSMesaColorBuffer(GLFWwindow* window, int* width, int* height, int* format, void** buffer);
+        """
+        width_value = ctypes.c_int(0)
+        width = ctypes.pointer(width_value)
+        height_value = ctypes.c_int(0)
+        height = ctypes.pointer(height_value)
+        format_value = ctypes.c_int(0)
+        format = ctypes.pointer(format_value)
+        buffer_value = ctypes.c_void_p(0)
+        buffer = ctypes.pointer(buffer_value)
+        success = _glfw.glfwGetOSMesaColorBuffer(window, width, height, format, buffer)
+        if not success:
+            return None
+        return width.value, height.value, format.value, buffer.value
+
+
+if hasattr(_glfw, 'glfwGetOSMesaDepthBuffer'):
+    _glfw.glfwGetOSMesaDepthBuffer.restype = ctypes.c_int
+    _glfw.glfwGetOSMesaDepthBuffer.argtypes = [ctypes.POINTER(_GLFWwindow), ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_void_p)]
+    def get_os_mesa_depth_buffer(window):
+        """
+        Retrieves the depth buffer associated with the specified window.
+
+        Wrapper for:
+            int glfwGetOSMesaDepthBuffer(GLFWwindow* window, int* width, int* height, int* bytesPerValue, void** buffer);
+        """
+        width_value = ctypes.c_int(0)
+        width = ctypes.pointer(width_value)
+        height_value = ctypes.c_int(0)
+        height = ctypes.pointer(height_value)
+        bytes_per_value_value = ctypes.c_int(0)
+        bytes_per_value = ctypes.pointer(bytes_per_value_value)
+        buffer_value = ctypes.c_void_p(0)
+        buffer = ctypes.pointer(buffer_value)
+        success = _glfw.glfwGetOSMesaDepthBuffer(window, width, height, bytes_per_value, buffer)
+        if not success:
+            return None
+        return width.value, height.value, bytes_per_value.value, buffer.value
+
+
+if hasattr(_glfw, 'glfwGetOSMesaContext'):
+    _glfw.glfwGetOSMesaContext.restype = ctypes.c_void_p
+    _glfw.glfwGetOSMesaContext.argtypes = [ctypes.POINTER(_GLFWwindow)]
+    def get_os_mesa_context(window):
+        """
+        Returns the OSMesaContext of the specified window.
+
+        Wrapper for:
+            OSMesaContext glfwGetOSMesaContext(GLFWwindow* window);
+        """
+        return _glfw.glfwGetOSMesaContext(window)
+
 _prepare_errcheck()
