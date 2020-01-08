@@ -152,21 +152,33 @@ if os.environ.get('PYGLFW_LIBRARY', ''):
     except OSError:
         glfw = None
 elif sys.platform == 'win32':
-    # try glfw3.dll using windows search paths
+    glfw = None  # Will become `not None` on success.
+
+    # try package directory
     try:
-        glfw = ctypes.CDLL('glfw3.dll')
+        if sys.maxsize > 2**32:
+            # load Microsoft Visual C++ 2012 runtime on 64-bit systems
+            msvcr = ctypes.CDLL(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'msvcr110.dll'))
+        else:
+            # load Microsoft Visual C++ 2010 runtime on 32-bit systems
+            msvcr = ctypes.CDLL(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'msvcr100.dll'))
+        glfw = ctypes.CDLL(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'glfw3.dll'))
     except OSError:
-        # try glfw3.dll in package directory
+        pass
+
+    # try conda's default location on Windows
+    if glfw is None:
         try:
-            if sys.maxsize > 2**32:
-                # load Microsoft Visual C++ 2012 runtime on 64-bit systems
-                msvcr = ctypes.CDLL(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'msvcr110.dll'))
-            else:
-                # load Microsoft Visual C++ 2010 runtime on 32-bit systems
-                msvcr = ctypes.CDLL(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'msvcr100.dll'))
-            glfw = ctypes.CDLL(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'glfw3.dll'))
+            glfw = ctypes.CDLL(os.path.join(sys.prefix, 'Library', 'bin', 'glfw3.dll'))
         except OSError:
-            glfw = None
+            pass
+    
+    # try Windows default search path
+    if glfw is None:
+        try:
+            glfw = ctypes.CDLL('glfw3.dll')
+        except OSError:
+            pass
 else:
     glfw = _load_library(['glfw', 'glfw3'], ['.so', '.dylib'],
                           _get_library_search_paths(), _glfw_get_version)
