@@ -12,7 +12,7 @@ __license__ = 'MIT'
 __version__ = '1.9.1'
 
 # By default (ERROR_REPORTING = True), GLFW errors will be reported as Python
-# exceptions. Set ERROR_REPORTING to False or set a curstom error callback to
+# warnings. Set ERROR_REPORTING to False or set a curstom error callback to
 # disable this behavior.
 ERROR_REPORTING = True
 
@@ -27,6 +27,7 @@ import ctypes
 import os
 import functools
 import sys
+import warnings
 
 from .library import glfw as _glfw
 
@@ -50,12 +51,16 @@ else:
         exec("raise exception, None, traceback")
 
 
-class GLFWError(Exception):
+class GLFWError(UserWarning):
     """
     Exception class used for reporting GLFW errors.
     """
     def __init__(self, message):
         super(GLFWError, self).__init__(message)
+
+# Raise GLFWError warnings as errors by default. This is done to keep behavior
+# compatible with prior implementations of glfw error reporting.
+warnings.filterwarnings(action='error', category=GLFWError, append=True)
 
 _callback_repositories = []
 
@@ -788,19 +793,19 @@ if hasattr(_glfw, 'glfwGetError'):
 
 
 @_callback_exception_decorator
-def _raise_glfw_errors_as_exceptions(error_code, description):
+def _handle_glfw_errors(error_code, description):
     """
-    Default error callback that raises GLFWError exceptions for glfw errors.
+    Default error callback that issues GLFWError warnings for glfw errors.
     Set an alternative error callback or set glfw.ERROR_REPORTING to False to
     disable this behavior.
     """
     global ERROR_REPORTING
     if ERROR_REPORTING:
         message = "(%d) %s" % (error_code, description)
-        raise GLFWError(message)
+        warnings.warn(message, GLFWError)
 
-_default_error_callback = _GLFWerrorfun(_raise_glfw_errors_as_exceptions)
-_error_callback = (_raise_glfw_errors_as_exceptions, _default_error_callback)
+_default_error_callback = _GLFWerrorfun(_handle_glfw_errors)
+_error_callback = (_handle_glfw_errors, _default_error_callback)
 _glfw.glfwSetErrorCallback.restype = _GLFWerrorfun
 _glfw.glfwSetErrorCallback.argtypes = [_GLFWerrorfun]
 _glfw.glfwSetErrorCallback(_default_error_callback)
