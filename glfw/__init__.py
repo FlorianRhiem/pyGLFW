@@ -11,9 +11,14 @@ __copyright__ = 'Copyright (c) 2013-2019 Florian Rhiem'
 __license__ = 'MIT'
 __version__ = '1.9.1'
 
-# By default (ERROR_REPORTING = True), GLFW errors will be reported as Python
-# warnings. Set ERROR_REPORTING to False or set a curstom error callback to
-# disable this behavior.
+# By default, GLFW errors will be handled by a pre-defined error callback.
+# Depending on the value of ERROR_REPORTING, this callback will:
+# - Raise a GLFWError exception, if ERROR_REPORTING is 'raise', 'exception'
+#   or True.
+# - Issue a GLFWError warning, if ERROR_REPORTING is 'warn' or 'warning'.
+# - Log on debug level using the 'glfw' logger, if ERROR_REPORTING is 'log'.
+# - Ignore the GLFWError, if ERROR_REPORTING is 'ignore' or False.
+# Alternatively, you can set a custom error callback using set_error_callback.
 ERROR_REPORTING = True
 
 # By default (NORMALIZE_GAMMA_RAMPS = True), gamma ramps are expected to
@@ -24,6 +29,7 @@ NORMALIZE_GAMMA_RAMPS = True
 
 import collections
 import ctypes
+import logging
 import os
 import functools
 import sys
@@ -57,10 +63,6 @@ class GLFWError(UserWarning):
     """
     def __init__(self, message):
         super(GLFWError, self).__init__(message)
-
-# Raise GLFWError warnings as errors by default. This is done to keep behavior
-# compatible with prior implementations of glfw error reporting.
-warnings.filterwarnings(action='error', category=GLFWError, append=True)
 
 _callback_repositories = []
 
@@ -795,14 +797,23 @@ if hasattr(_glfw, 'glfwGetError'):
 @_callback_exception_decorator
 def _handle_glfw_errors(error_code, description):
     """
-    Default error callback that issues GLFWError warnings for glfw errors.
-    Set an alternative error callback or set glfw.ERROR_REPORTING to False to
-    disable this behavior.
+    Default error callback that raises GLFWError exceptions, issues GLFWError
+    warnings or logs to the 'glfw' logger.
+    Set an alternative error callback or set glfw.ERROR_REPORTING to False or
+    'ignore' to disable this behavior.
     """
     global ERROR_REPORTING
-    if ERROR_REPORTING:
-        message = "(%d) %s" % (error_code, description)
+    message = "(%d) %s" % (error_code, description)
+    if ERROR_REPORTING in ('raise', 'exception', True):
+        raise GLFWError(message)
+    elif ERROR_REPORTING in ('warn', 'warning'):
         warnings.warn(message, GLFWError)
+    elif ERROR_REPORTING in ('log',):
+        logging.getLogger('glfw').debug(message)
+    elif ERROR_REPORTING in ('ignore', False):
+        pass
+    else:
+        raise ValueError('Invalid value of ERROR_REPORTING while handling GLFW error:\n' + message)
 
 _default_error_callback = _GLFWerrorfun(_handle_glfw_errors)
 _error_callback = (_handle_glfw_errors, _default_error_callback)

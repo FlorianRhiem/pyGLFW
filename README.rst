@@ -18,7 +18,9 @@ except for:
 -  Gamma ramps use floats between 0.0 and 1.0 instead of unsigned shorts
    (use ``glfw.NORMALIZE_GAMMA_RAMPS=False`` to disable this)
 -  GLFW errors are reported as ``glfw.GLFWError`` exceptions if no error
-   callback is set (use ``glfw.ERROR_REPORTING=False`` to disable this)
+   callback is set (use ``glfw.ERROR_REPORTING=False`` to disable this,
+   set it to 'warn' instead to issue warnings or set it to 'log' to log it
+   using the 'glfw' logger)
 -  instead of a sequence for ``GLFWimage`` structs, PIL/pillow ``Image``
    objects can be used
 
