@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [1.10.0] - 2020-01-19
+- Added more options to error reporting
+
 ## [1.9.1] - 2020-01-08
 - Added conda search path for Windows
 
