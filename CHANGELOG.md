@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [1.10.1] - 2020-01-21
+- Fixed default error callback name
+
 ## [1.10.0] - 2020-01-19
 - Added more options to error reporting
 
