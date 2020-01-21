@@ -830,14 +830,14 @@ def set_error_callback(cbfun):
     global _error_callback
     previous_callback = _error_callback
     if cbfun is None:
-        cbfun = _raise_glfw_errors_as_exceptions
+        cbfun = _handle_glfw_errors
         c_cbfun = _default_error_callback
     else:
         c_cbfun = _GLFWerrorfun(cbfun)
     _error_callback = (cbfun, c_cbfun)
     cbfun = c_cbfun
     _glfw.glfwSetErrorCallback(cbfun)
-    if previous_callback is not None and previous_callback[0] != _raise_glfw_errors_as_exceptions:
+    if previous_callback is not None and previous_callback[0] != _handle_glfw_errors:
         return previous_callback[0]
 
 _glfw.glfwGetMonitors.restype = ctypes.POINTER(ctypes.POINTER(_GLFWmonitor))
