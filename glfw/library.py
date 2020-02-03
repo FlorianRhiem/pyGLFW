@@ -125,9 +125,10 @@ def _get_library_search_paths():
     Returns a list of library search paths, considering of the current working
     directory, default paths and paths from environment variables.
     """
+    package_path = os.path.abspath(os.path.dirname(__file__))
     search_paths = [
         '',
-        os.path.abspath(os.path.dirname(__file__)),
+        package_path,
         sys.prefix + '/lib',
         '/usr/lib64',
         '/usr/local/lib64',
@@ -136,6 +137,14 @@ def _get_library_search_paths():
         '/usr/lib/x86_64-linux-gnu/',
         '/usr/lib/aarch64-linux-gnu/',
     ]
+
+    if sys.platform != 'darwin':
+        # manylinux2014 wheels contain libraries built for X11 and Wayland
+        if os.environ.get('XDG_SESSION_TYPE') == 'wayland':
+            search_paths.insert(1, os.path.join(package_path, 'wayland'))
+        else:
+            # X11 is the default, even if XDG_SESSION_TYPE is not set
+            search_paths.insert(1, os.path.join(package_path, 'x11'))
 
     if sys.platform == 'darwin':
         path_environment_variable = 'DYLD_LIBRARY_PATH'
