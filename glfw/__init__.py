@@ -57,6 +57,13 @@ else:
         exec("raise exception, None, traceback")
 
 
+# Make sure that glfw windows pick up being moved from one monitor to another
+try:
+    ctypes.windll.shcore.SetProcessDpiAwareness(2)
+except Exception:
+    pass  # fail on non-windows / old windows
+
+
 class GLFWError(UserWarning):
     """
     Exception class used for reporting GLFW errors.
