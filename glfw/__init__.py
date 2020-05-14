@@ -266,8 +266,8 @@ class _GLFWgamepadstate(ctypes.Structure):
 
     def __init__(self):
         ctypes.Structure.__init__(self)
-        self.buttons = (ctypes.c_ubyte * 15)([0] * 15)
-        self.axes = (ctypes.c_float * 6)([0] * 6)
+        self.buttons = (ctypes.c_ubyte * 15)(* [0] * 15)
+        self.axes = (ctypes.c_float * 6)(* [0] * 6)
 
     def wrap(self, gamepad_state):
         """
