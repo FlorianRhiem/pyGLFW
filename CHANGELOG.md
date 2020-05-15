@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [1.11.1] - 2020-05-15
+- Fixed a TypeError in _GLFWgamepadstate
+
 ## [1.11.0] - 2020-02-21
 - Updated to GLFW 3.3.2
 - Include support for both X11 and Wayland libraries in the wheel
