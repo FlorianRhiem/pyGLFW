@@ -13,12 +13,12 @@ __version__ = '1.11.1'
 
 # By default, GLFW errors will be handled by a pre-defined error callback.
 # Depending on the value of ERROR_REPORTING, this callback will:
-# - Raise a GLFWError exception, if ERROR_REPORTING is 'raise', 'exception'
+# - Raise a GLFWError exception, if ERROR_REPORTING is 'raise', 'exception'
 #   or True.
 # - Issue a GLFWError warning, if ERROR_REPORTING is 'warn' or 'warning'.
-# - Log on debug level using the 'glfw' logger, if ERROR_REPORTING is 'log'.
+# - Log on debug level using the 'glfw' logger, if ERROR_REPORTING is 'log'.
 # - Ignore the GLFWError, if ERROR_REPORTING is 'ignore' or False.
-# Alternatively, you can set a custom error callback using set_error_callback.
+# Alternatively, you can set a custom error callback using set_error_callback.
 ERROR_REPORTING = True
 
 # By default (NORMALIZE_GAMMA_RAMPS = True), gamma ramps are expected to

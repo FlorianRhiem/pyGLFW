@@ -143,7 +143,7 @@ def _get_library_search_paths():
         if os.environ.get('XDG_SESSION_TYPE') == 'wayland':
             search_paths.insert(1, os.path.join(package_path, 'wayland'))
         else:
-            # X11 is the default, even if XDG_SESSION_TYPE is not set
+            # X11 is the default, even if XDG_SESSION_TYPE is not set
             search_paths.insert(1, os.path.join(package_path, 'x11'))
 
     if sys.platform == 'darwin':
