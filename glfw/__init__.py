@@ -1334,7 +1334,8 @@ if hasattr(_glfw, 'glfwSetWindowOpacity'):
         Wrapper for:
             void glfwSetWindowOpacity(GLFWwindow* window, float opacity);
         """
-        _glfw.glfwSetWindowOpacity(window)
+        opacity = ctypes.c_float(opacity)
+        _glfw.glfwSetWindowOpacity(window, opacity)
 
 
 _glfw.glfwIconifyWindow.restype = None
