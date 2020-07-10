@@ -56,6 +56,18 @@ else:
         # wrapped in exec, as python 3 does not support this variant of raise
         exec("raise exception, None, traceback")
 
+# support for CFFI pointers for Vulkan objects
+try:
+    from cffi import FFI
+except ImportError:
+    _cffi_to_ctypes_void_p = lambda ptr: ptr
+else:
+    ffi = FFI()
+    def _cffi_to_ctypes_void_p(ptr):
+        if isinstance(ptr, ffi.CData):
+            return ctypes.cast(int(ffi.cast('uintptr_t', ptr)), ctypes.c_void_p)
+        return ptr
+
 
 class GLFWError(UserWarning):
     """
@@ -2558,6 +2570,9 @@ if hasattr(_glfw, 'glfwCreateWindowSurface'):
         Wrapper for:
             VkResult glfwCreateWindowSurface(VkInstance instance, GLFWwindow* window, const VkAllocationCallbacks* allocator, VkSurfaceKHR* surface);
         """
+        instance = _cffi_to_ctypes_void_p(instance)
+        surface = _cffi_to_ctypes_void_p(surface)
+        allocator = _cffi_to_ctypes_void_p(allocator)
         return _glfw.glfwCreateWindowSurface(instance, window, allocator, surface)
 
 if hasattr(_glfw, 'glfwGetPhysicalDevicePresentationSupport'):
@@ -2572,6 +2587,8 @@ if hasattr(_glfw, 'glfwGetPhysicalDevicePresentationSupport'):
         Wrapper for:
             int glfwGetPhysicalDevicePresentationSupport(VkInstance instance, VkPhysicalDevice device, uint32_t queuefamily);
         """
+        instance = _cffi_to_ctypes_void_p(instance)
+        device = _cffi_to_ctypes_void_p(device)
         return _glfw.glfwGetPhysicalDevicePresentationSupport(instance, device, queuefamily)
 
 if hasattr(_glfw, 'glfwGetInstanceProcAddress'):
@@ -2585,6 +2602,7 @@ if hasattr(_glfw, 'glfwGetInstanceProcAddress'):
         Wrapper for:
             GLFWvkproc glfwGetInstanceProcAddress(VkInstance instance, const char* procname);
         """
+        instance = _cffi_to_ctypes_void_p(instance)
         return _glfw.glfwGetInstanceProcAddress(instance, procname)
 
 if hasattr(_glfw, 'glfwSetWindowIcon'):
