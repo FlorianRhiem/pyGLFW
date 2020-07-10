@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [1.12.0] - 2020-07-10
+- Added support for CFFI pointers for Vulkan objects
+
 ## [1.11.2] - 2020-06-03
 - Fixed missing parameter in set_window_opacity
 - Replaced non-ASCII whitespace
