@@ -19,8 +19,9 @@ except for:
    (use ``glfw.NORMALIZE_GAMMA_RAMPS=False`` to disable this)
 -  GLFW errors are reported as ``glfw.GLFWError`` exceptions if no error
    callback is set (use ``glfw.ERROR_REPORTING=False`` to disable this,
-   set it to 'warn' instead to issue warnings or set it to 'log' to log it
-   using the 'glfw' logger)
+   set it to 'warn' instead to issue warnings, set it to 'log' to log it
+   using the 'glfw' logger or set it to a dict to define the behavior for
+   specific error codes)
 -  instead of a sequence for ``GLFWimage`` structs, PIL/pillow ``Image``
    objects can be used
 

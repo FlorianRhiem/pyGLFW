@@ -18,6 +18,8 @@ __version__ = '1.12.0'
 # - Issue a GLFWError warning, if ERROR_REPORTING is 'warn' or 'warning'.
 # - Log on debug level using the 'glfw' logger, if ERROR_REPORTING is 'log'.
 # - Ignore the GLFWError, if ERROR_REPORTING is 'ignore' or False.
+# If ERROR_REPORTING is a dict containing the specific error code or None as a
+# key, the corresponding value will be used.
 # Alternatively, you can set a custom error callback using set_error_callback.
 ERROR_REPORTING = True
 
@@ -818,13 +820,21 @@ def _handle_glfw_errors(error_code, description):
     """
     global ERROR_REPORTING
     message = "(%d) %s" % (error_code, description)
-    if ERROR_REPORTING in ('raise', 'exception', True):
+    error_reporting = ERROR_REPORTING
+    if isinstance(error_reporting, dict):
+        if error_code in error_reporting:
+            error_reporting = error_reporting[error_code]
+        elif None in error_reporting:
+            error_reporting = error_reporting[None]
+        else:
+            error_reporting = None
+    if error_reporting in ('raise', 'exception', True):
         raise GLFWError(message, error_code=error_code)
-    elif ERROR_REPORTING in ('warn', 'warning'):
+    elif error_reporting in ('warn', 'warning'):
         warnings.warn(message, GLFWError)
-    elif ERROR_REPORTING in ('log',):
+    elif error_reporting in ('log',):
         logging.getLogger('glfw').debug(message)
-    elif ERROR_REPORTING in ('ignore', False):
+    elif error_reporting in ('ignore', False):
         pass
     else:
         raise ValueError('Invalid value of ERROR_REPORTING while handling GLFW error:\n' + message)
