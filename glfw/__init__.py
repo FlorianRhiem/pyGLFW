@@ -73,8 +73,10 @@ class GLFWError(UserWarning):
     """
     Exception class used for reporting GLFW errors.
     """
-    def __init__(self, message):
+    def __init__(self, message, error_code=None):
         super(GLFWError, self).__init__(message)
+        self.error_code = error_code
+
 
 _callback_repositories = []
 
@@ -817,7 +819,7 @@ def _handle_glfw_errors(error_code, description):
     global ERROR_REPORTING
     message = "(%d) %s" % (error_code, description)
     if ERROR_REPORTING in ('raise', 'exception', True):
-        raise GLFWError(message)
+        raise GLFWError(message, error_code=error_code)
     elif ERROR_REPORTING in ('warn', 'warning'):
         warnings.warn(message, GLFWError)
     elif ERROR_REPORTING in ('log',):
