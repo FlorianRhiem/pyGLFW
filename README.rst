@@ -17,7 +17,7 @@ except for:
    and an object count
 -  Gamma ramps use floats between 0.0 and 1.0 instead of unsigned shorts
    (use ``glfw.NORMALIZE_GAMMA_RAMPS=False`` to disable this)
--  GLFW errors are reported as ``glfw.GLFWError`` exceptions if no error
+-  GLFW errors are reported as ``glfw.GLFWError`` warnings if no error
    callback is set (use ``glfw.ERROR_REPORTING=False`` to disable this,
    set it to 'warn' instead to issue warnings, set it to 'log' to log it
    using the 'glfw' logger or set it to a dict to define the behavior for

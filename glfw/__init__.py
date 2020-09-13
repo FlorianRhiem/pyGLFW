@@ -21,7 +21,7 @@ __version__ = '1.12.0'
 # If ERROR_REPORTING is a dict containing the specific error code or None as a
 # key, the corresponding value will be used.
 # Alternatively, you can set a custom error callback using set_error_callback.
-ERROR_REPORTING = True
+ERROR_REPORTING = 'warn'
 
 # By default (NORMALIZE_GAMMA_RAMPS = True), gamma ramps are expected to
 # contain values between 0 and 1, and the conversion to unsigned shorts will
