@@ -6,7 +6,7 @@ build-manylinux2014-x86_64:
   stage: build
   image: quay.io/pypa/manylinux2014_x86_64
   script:
-  - GLFW_VERSION=3.3.2
+  - GLFW_VERSION=3.3.3
   # Download GLFW from source
   - curl -LO https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.zip
   - unzip glfw-${GLFW_VERSION}.zip
@@ -47,7 +47,7 @@ build-manylinux2010-x86_64:
   stage: build
   image: quay.io/pypa/manylinux2010_x86_64
   script:
-  - GLFW_VERSION=3.3.2
+  - GLFW_VERSION=3.3.3
   # Download GLFW from source
   - curl -LO https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.zip
   - unzip glfw-${GLFW_VERSION}.zip
@@ -71,7 +71,7 @@ build-manylinux2010-i686:
   stage: build
   image: quay.io/pypa/manylinux2010_i686
   script:
-  - GLFW_VERSION=3.3.2
+  - GLFW_VERSION=3.3.3
   # Download GLFW from source
   - curl -LO https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.zip
   - unzip glfw-${GLFW_VERSION}.zip
@@ -98,7 +98,7 @@ packages:
   script:
   - apt-get update -qy
   - apt-get install -y curl python3-setuptools python3-wheel unzip
-  - GLFW_VERSION=3.3.2
+  - GLFW_VERSION=3.3.3
   # Build source distribution
   - python3 setup.py sdist
   # Build wheel for Windows x86
@@ -118,7 +118,7 @@ packages:
   # Build wheel for macOS x86_64
   - curl -L -o glfw.bin.zip https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.bin.MACOS.zip
   - unzip glfw.bin.zip -d glfw.bin
-  - cp glfw.bin/*/lib-macos/libglfw.3.dylib glfw/libglfw.3.dylib
+  - cp glfw.bin/*/lib-x86_64/libglfw.3.dylib glfw/libglfw.3.dylib
   - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38 --plat-name macosx_10.6_intel
   - rm -rf glfw.bin.zip glfw.bin glfw/libglfw.3.dylib build
   # Build wheel for manylinux2010 x86

@@ -306,7 +306,7 @@ class _GLFWgamepadstate(ctypes.Structure):
 
 VERSION_MAJOR = 3
 VERSION_MINOR = 3
-VERSION_REVISION = 0
+VERSION_REVISION = 3
 TRUE = 1
 FALSE = 0
 RELEASE = 0
