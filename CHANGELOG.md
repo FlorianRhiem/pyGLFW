@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [2.1.0] - 2021-02-28
+- Updated to GLFW 3.3.3
+
 ## [2.0.0] - 2020-10-04
 - Changed default error reporting method to warn
 - Allow dict for ERROR_REPORTING
