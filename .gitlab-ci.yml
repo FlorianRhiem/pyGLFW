@@ -43,6 +43,52 @@ build-manylinux2014-x86_64:
     paths:
     - artifacts-manylinux2014-x86_64
 
+build-manylinux2014-aarch64:
+  stage: build
+  image: quay.io/pypa/manylinux2014_aarch64
+  tags:
+    - arm64
+    - linux
+
+  script:
+  - GLFW_VERSION=3.3.3
+  # Download GLFW from source
+  - curl -LO https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.zip
+  - unzip glfw-${GLFW_VERSION}.zip
+  # Install cmake
+  - curl -LO https://github.com/Kitware/CMake/releases/download/v3.21.2/cmake-3.21.2-linux-aarch64.tar.gz
+  - tar xzf cmake-3.21.2-linux-aarch64.tar.gz
+  - mv cmake-3.21.2-linux-aarch64 cmake
+  # Install build dependencies for X11
+  - yum install -y libXinerama-devel libXrandr-devel libXcursor-devel libXi-devel
+  # Build GLFW for X11
+  - mkdir build_x11
+  - cd build_x11
+  - ../cmake/bin/cmake ../glfw-${GLFW_VERSION} -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF
+  - make
+  - mkdir -p ../artifacts-manylinux2014-aarch64/x11
+  - cp src/libglfw.so ../artifacts-manylinux2014-aarch64/x11/libglfw.so
+  - cd ..
+  # Install build dependencies for Wayland
+  - yum install -y epel-release
+  - yum install -y extra-cmake-modules libwayland-client-devel libxkbcommon-devel
+  - curl -LO https://wayland.freedesktop.org/releases/wayland-protocols-1.17.tar.xz
+  - tar xf wayland-protocols-1.17.tar.xz
+  - cd wayland-protocols-1.17
+  - ./configure
+  - make install
+  - cd ..
+  # Build GLFW for Wayland
+  - mkdir build_wayland
+  - cd build_wayland
+  - PKG_CONFIG_PATH=/usr/local/share/pkgconfig ../cmake/bin/cmake ../glfw-${GLFW_VERSION} -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DGLFW_USE_WAYLAND=ON
+  - make
+  - mkdir -p ../artifacts-manylinux2014-aarch64/wayland
+  - cp src/libglfw.so ../artifacts-manylinux2014-aarch64/wayland/libglfw.so
+  artifacts:
+    paths:
+    - artifacts-manylinux2014-aarch64
+
 build-manylinux2010-x86_64:
   stage: build
   image: quay.io/pypa/manylinux2010_x86_64
@@ -135,6 +181,13 @@ packages:
   - mkdir glfw/wayland/
   - cp artifacts-manylinux2014-x86_64/wayland/libglfw.so glfw/wayland/libglfw.so
   - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38 --plat-name manylinux2014_x86_64
+  - rm -rf glfw/x11/libglfw.so glfw/wayland/libglfw.so build
+  # Build wheel for manylinux2014 aarch64
+  - mkdir -p glfw/x11/
+  - cp artifacts-manylinux2014-aarch64/x11/libglfw.so glfw/x11/libglfw.so
+  - mkdir -p glfw/wayland/
+  - cp artifacts-manylinux2014-aarch64/wayland/libglfw.so glfw/wayland/libglfw.so
+  - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38 --plat-name manylinux2014_aarch64
   - rm -rf glfw/x11/libglfw.so glfw/wayland/libglfw.so build
   artifacts:
     paths:
