@@ -46,10 +46,6 @@ build-manylinux2014-x86_64:
 build-manylinux2014-aarch64:
   stage: build
   image: quay.io/pypa/manylinux2014_aarch64
-  tags:
-    - arm64
-    - linux
-
   script:
   - GLFW_VERSION=3.3.3
   # Download GLFW from source
