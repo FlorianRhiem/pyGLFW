@@ -133,6 +133,7 @@ def _get_library_search_paths():
         '/usr/lib64',
         '/usr/local/lib64',
         '/usr/lib', '/usr/local/lib',
+        '/opt/homebrew/lib',
         '/run/current-system/sw/lib',
         '/usr/lib/x86_64-linux-gnu/',
         '/usr/lib/aarch64-linux-gnu/',
