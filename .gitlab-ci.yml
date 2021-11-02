@@ -162,6 +162,10 @@ packages:
   - unzip glfw.bin.zip -d glfw.bin
   - cp glfw.bin/*/lib-x86_64/libglfw.3.dylib glfw/libglfw.3.dylib
   - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38 --plat-name macosx_10.6_intel
+  - rm -rf glfw/libglfw.3.dylib build
+  # Build wheel for macOS arm64
+  - cp glfw.bin/*/lib-arm64/libglfw.3.dylib glfw/libglfw.3.dylib
+  - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38 --plat-name macosx_11.0_arm64
   - rm -rf glfw.bin.zip glfw.bin glfw/libglfw.3.dylib build
   # Build wheel for manylinux2010 x86
   - cp artifacts-manylinux2010-i686/libglfw.so glfw/libglfw.so
