@@ -190,10 +190,10 @@ packages:
   - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38 --plat-name manylinux2014_aarch64
   - rm -rf glfw/x11/libglfw.so glfw/wayland/libglfw.so build
   # Build source distribution for glfw_preview helper package
-  - cd utils
-  - python3 glfw_preview_setup.py sdist
-  - cp dist/* ../dist
-  - cd ..
+  - cd utils/glfw_preview
+  - python3 setup.py sdist
+  - cp dist/* ../../dist
+  - cd ../..
   artifacts:
     paths:
     - dist/

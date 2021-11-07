@@ -2,9 +2,9 @@ from setuptools import setup
 
 setup(
     name='glfw_preview',
-    version='0.0.1',
-    description='A helper script for the glfw package.',
-    long_description='This is a helper script for the glfw package that enables wrappers for unreleased GLFW3 macros and functions.',
+    version='0.0.3',
+    description='A helper package for the glfw package.',
+    long_description='This is a helper package for the glfw package that enables wrappers for unreleased GLFW3 macros and functions.',
     url='https://github.com/FlorianRhiem/pyGLFW',
     author='Florian Rhiem',
     author_email='florian.rhiem@gmail.com',
@@ -20,5 +20,5 @@ setup(
         'Topic :: Multimedia :: Graphics',
         'Topic :: Scientific/Engineering :: Visualization',
     ],
-    py_modules=['glfw_preview'],
+    packages=['glfw_preview'],
 )
