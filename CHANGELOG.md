@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [2.4.0] - 2021-11-07
+- Added macOS wheels for arm64
+- Added wrappers for unreleased macros and functions
+- Updated to GLFW 3.3.5
+
 ## [2.3.0] - 2021-10-01
 - Added /opt/homebrew/lib to library search paths
 
