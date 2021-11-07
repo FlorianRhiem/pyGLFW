@@ -42,6 +42,22 @@ from .library import glfw as _glfw
 if _glfw is None:
     raise ImportError("Failed to load GLFW3 shared library.")
 
+# By default, pyGLFW will only provide functionality from released GLFW
+# versions, as using the development version may lead to changing behavior or
+# missing functions. If the environment variable PYGLFW_PREVIEW is set or the
+# glfw_preview package can be imported, macros and functions from the current
+# developtment version of GLFW will be provided. Note that there will still be
+# a delay between them getting added to GLFW and being wrapped by pyGLFW, and
+# further delay until they are included in a pyGLFW release.
+_PREVIEW = os.environ.get('PYGLFW_PREVIEW')
+if _PREVIEW is None:
+    try:
+        import glfw_preview
+        _PREVIEW = True
+    except:
+        _PREVIEW = False
+else:
+    _PREVIEW = bool(_PREVIEW)
 
 # Python 3 compatibility:
 try:
@@ -597,6 +613,39 @@ COCOA_CHDIR_RESOURCES = 0x00051001
 COCOA_MENUBAR = 0x00051002
 DONT_CARE = -1
 
+
+if _PREVIEW:
+    ANGLE_PLATFORM_TYPE = 0x00050002
+    ANGLE_PLATFORM_TYPE_NONE = 0x00037001
+    ANGLE_PLATFORM_TYPE_OPENGL = 0x00037002
+    ANGLE_PLATFORM_TYPE_OPENGLES = 0x00037003
+    ANGLE_PLATFORM_TYPE_D3D9 = 0x00037004
+    ANGLE_PLATFORM_TYPE_D3D11 = 0x00037005
+    ANGLE_PLATFORM_TYPE_VULKAN = 0x00037007
+    ANGLE_PLATFORM_TYPE_METAL = 0x00037008
+    ANY_PLATFORM = 0x00060000
+    CONTEXT_DEBUG = 0x00022007
+    CURSOR_UNAVAILABLE = 0x0001000B
+    FEATURE_UNAVAILABLE = 0x0001000C
+    FEATURE_UNIMPLEMENTED = 0x0001000D
+    MOUSE_PASSTHROUGH = 0x0002000D
+    NOT_ALLOWED_CURSOR = 0x0003600A
+    PLATFORM = 0x00050003
+    PLATFORM_COCOA = 0x00060002
+    PLATFORM_NULL = 0x00060005
+    PLATFORM_UNAVAILABLE = 0x0001000E
+    PLATFORM_WAYLAND = 0x00060003
+    PLATFORM_WIN32 = 0x00060001
+    PLATFORM_X11 = 0x00060004
+    POINTING_HAND_CURSOR = 0x00036004
+    RESIZE_ALL_CURSOR = 0x00036009
+    RESIZE_EW_CURSOR = 0x00036005
+    RESIZE_NESW_CURSOR = 0x00036008
+    RESIZE_NS_CURSOR = 0x00036006
+    RESIZE_NWSE_CURSOR = 0x00036007
+    WIN32_KEYBOARD_MENU = 0x00025001
+    X11_XCB_VULKAN_SURFACE = 0x00052001
+
 _exc_info_from_callback = None
 def _callback_exception_decorator(func):
     @functools.wraps(func)
@@ -715,6 +764,29 @@ _GLFWcharmodsfun = ctypes.CFUNCTYPE(None,
 _GLFWjoystickfun = ctypes.CFUNCTYPE(None,
                                     ctypes.c_int,
                                     ctypes.c_int)
+
+if _PREVIEW:
+    _GLFWallocatefun = ctypes.CFUNCTYPE(ctypes.c_void_p,
+                                          ctypes.c_size_t,
+                                          ctypes.c_void_p)
+    _GLFWreallocatefun = ctypes.CFUNCTYPE(ctypes.c_void_p,
+                                          ctypes.c_void_p,
+                                          ctypes.c_size_t,
+                                          ctypes.c_void_p)
+    _GLFWdeallocatefun = ctypes.CFUNCTYPE(None,
+                                          ctypes.c_void_p,
+                                          ctypes.c_void_p)
+
+    class _GLFWallocator(ctypes.Structure):
+        """
+        Wrapper for:
+            typedef struct GLFWallocator GLFWallocator;
+        """
+        _fields_ = [
+            ("allocate", _GLFWallocatefun),
+            ("reallocate", _GLFWreallocatefun),
+            ("deallocate", _GLFWdeallocatefun),
+        ]
 
 
 _glfw.glfwInit.restype = ctypes.c_int
@@ -3109,5 +3181,88 @@ if hasattr(_glfw, 'glfwGetOSMesaContext'):
             OSMesaContext glfwGetOSMesaContext(GLFWwindow* window);
         """
         return _glfw.glfwGetOSMesaContext(window)
+
+if _PREVIEW:
+    if hasattr(_glfw, 'glfwInitAllocator'):
+        _allocate_callback = None
+        _reallocate_callback = None
+        _deallocate_callback = None
+        _glfw.glfwInitAllocator.restype = None
+        _glfw.glfwInitAllocator.argtypes = [ctypes.POINTER(_GLFWallocator)]
+        def init_allocator(allocate, reallocate, deallocate):
+            """
+            Sets the init allocator to the desired value.
+
+            Wrapper for:
+                void glfwInitAllocator(const GLFWallocator* allocator);
+            """
+            global _allocate_callback
+            global _reallocate_callback
+            global _deallocate_callback
+            if allocate is None and reallocate is None and deallocate is None:
+                allocator_ptr = ctypes.POINTER(_GLFWallocator)(0)
+            else:
+                if allocate is None:
+                    allocate = 0
+                c_allocate = _GLFWallocatefun(allocate)
+                _allocate_callback = (allocate, c_allocate)
+                if reallocate is None:
+                    reallocate = 0
+                c_reallocate = _GLFWreallocatefun(reallocate)
+                _reallocate_callback = (reallocate, c_reallocate)
+                if deallocate is None:
+                    deallocate = 0
+                c_deallocate = _GLFWdeallocatefun(deallocate)
+                _deallocate_callback = (deallocate, c_deallocate)
+                allocator = _GLFWallocator()
+                allocator.allocate = c_allocate
+                allocator.reallocate = c_reallocate
+                allocator.deallocate = c_deallocate
+                allocator_ptr = ctypes.byref(allocator)
+            _glfw.glfwInitAllocator(allocator_ptr)
+
+    if hasattr(_glfw, 'glfwInitVulkanLoader'):
+        _loader_callback = None
+        _loader_callback_type = ctypes.CFUNCTYPE(ctypes.c_void_p, ctypes.c_void_p, ctypes.c_char_p)
+        _glfw.glfwInitVulkanLoader.restype = None
+        _glfw.glfwInitVulkanLoader.argtypes = [_loader_callback_type]
+        def init_vulkan_loader(loader):
+            """
+            Sets the desired Vulkan `vkGetInstanceProcAddr` function.
+
+            Wrapper for:
+                void glfwInitVulkanLoader(PFN_vkGetInstanceProcAddr loader);
+            """
+            global _loader_callback
+            if loader is None:
+                loader = 0
+            c_loader = _loader_callback_type(loader)
+            _loader_callback = (loader, c_loader)
+            _glfw.glfwInitVulkanLoader(c_loader)
+
+    if hasattr(_glfw, 'glfwGetPlatform'):
+        _glfw.glfwGetPlatform.restype = ctypes.c_int
+        _glfw.glfwGetPlatform.argtypes = []
+        def get_platform():
+            """
+            Returns the currently selected platform.
+
+            Wrapper for:
+                int glfwGetPlatform(void);
+            """
+            return _glfw.glfwGetPlatform()
+
+    if hasattr(_glfw, 'glfwPlatformSupported'):
+        _glfw.glfwPlatformSupported.restype = ctypes.c_int
+        _glfw.glfwPlatformSupported.argtypes = [ctypes.c_int]
+        def platform_supported(platform):
+            """
+            Returns whether the library includes support for the specified platform.
+
+            Wrapper for:
+                int glfwPlatformSupported(int platform);
+            """
+            return _glfw.glfwPlatformSupported(platform)
+
 
 _prepare_errcheck()

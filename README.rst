@@ -70,6 +70,21 @@ pyGLFW will search for the library in a list of search paths (including those
 in ``LD_LIBRARY_PATH``). If you want to use a specific library, you can set
 the ``PYGLFW_LIBRARY`` environment variable to its path.
 
+Development Version
+~~~~~~~~~~~~~~~~~~~
+
+If you are using the development version of GLFW and would like to use wrappers
+for currently unreleased macros and functions, you can instead install:
+
+.. code:: sh
+
+    pip install glfw[preview]
+
+or set the ``PYGLFW_PREVIEW`` environment variable.
+
+Note, however, that there will be a slight delay between the development
+version of GLFW and the wrappers provided by this package.
+
 Example Code
 ------------
 

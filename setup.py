@@ -38,5 +38,8 @@ setup(
             'msvcr100.dll',
             'msvcr110.dll',
         ]
+    },
+    extras_require={
+        'preview': ['glfw_preview']
     }
 )
