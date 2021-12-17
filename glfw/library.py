@@ -137,6 +137,7 @@ def _get_library_search_paths():
         '/run/current-system/sw/lib',
         '/usr/lib/x86_64-linux-gnu/',
         '/usr/lib/aarch64-linux-gnu/',
+        '/usr/lib/arm-linux-gnueabihf',
     ]
 
     if sys.platform != 'darwin':
