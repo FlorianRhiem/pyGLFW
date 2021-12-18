@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [2.5.0] - 2021-12-18
+- Added /usr/lib/arm-linux-gnueabihf to library search paths
+
 ## [2.4.0] - 2021-11-07
 - Added macOS wheels for arm64
 - Added wrappers for unreleased macros and functions
