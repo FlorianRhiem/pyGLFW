@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
 __copyright__ = 'Copyright (c) 2013-2021 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '2.5.0'
+__version__ = '2.5.1'
 
 # By default, GLFW errors will be handled by a pre-defined error callback.
 # Depending on the value of ERROR_REPORTING, this callback will:
