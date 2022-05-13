@@ -71,8 +71,7 @@ def _glfw_get_version(filename):
     Queries and returns the library version tuple or None by using a
     subprocess.
     """
-    is_python3 = sys.version_info.major == 3
-    version_checker_source = f'''
+    version_checker_source = '''
         import sys
         import ctypes
 
@@ -95,7 +94,10 @@ def _glfw_get_version(filename):
             else:
                 return None
 
-        input_func = {'input' if is_python3 else 'raw_input'}
+        try:
+            input_func = raw_input
+        except NameError:
+            input_func = input
         filename = input_func().strip()
 
         try:
@@ -109,7 +111,7 @@ def _glfw_get_version(filename):
 
     args = [sys.executable, '-c', textwrap.dedent(version_checker_source)]
     process = subprocess.Popen(args, universal_newlines=True,
-                               stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+                               stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out = process.communicate(filename)[0]
     out = out.strip()
     if out:
