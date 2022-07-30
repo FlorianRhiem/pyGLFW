@@ -646,6 +646,12 @@ if _PREVIEW:
     WIN32_KEYBOARD_MENU = 0x00025001
     X11_XCB_VULKAN_SURFACE = 0x00052001
 
+    ANY_POSITION = 0x80000000
+    POSITION_X = 0x0002000E
+    POSITION_Y = 0x0002000F
+    WAYLAND_APP_ID = 0x00026001
+    CURSOR_CAPTURED = 0x00034004
+
 _exc_info_from_callback = None
 def _callback_exception_decorator(func):
     @functools.wraps(func)
