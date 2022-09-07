@@ -1093,8 +1093,10 @@ if hasattr(_glfw, 'glfwSetMonitorUserPointer') and hasattr(_glfw, 'glfwGetMonito
             pointer = ctypes.cast(ctypes.pointer(ctypes.py_object(pointer)),
                                   ctypes.c_void_p)
 
-        _monitor_user_data_repository[monitor] = data
-        _glfw.glfwSetWindowUserPointer(monitor, pointer)
+        monitor_addr = ctypes.cast(ctypes.pointer(monitor),
+                                  ctypes.POINTER(ctypes.c_long)).contents.value
+        _monitor_user_data_repository[monitor_addr] = data
+        _glfw.glfwSetMonitorUserPointer(monitor, pointer)
 
 
     _glfw.glfwGetMonitorUserPointer.restype = ctypes.c_void_p
@@ -1108,9 +1110,11 @@ if hasattr(_glfw, 'glfwSetMonitorUserPointer') and hasattr(_glfw, 'glfwGetMonito
         Wrapper for:
             void* glfwGetMonitorUserPointer(int jid);
         """
+        monitor_addr = ctypes.cast(ctypes.pointer(monitor),
+                                  ctypes.POINTER(ctypes.c_long)).contents.value
 
-        if monitor in _monitor_user_data_repository:
-            data = _monitor_user_data_repository[monitor]
+        if monitor_addr in _monitor_user_data_repository:
+            data = _monitor_user_data_repository[monitor_addr]
             is_wrapped_py_object = data[0]
             if is_wrapped_py_object:
                 return data[1]
