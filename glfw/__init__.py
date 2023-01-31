@@ -2299,6 +2299,8 @@ def set_clipboard_string(window, string):
     Wrapper for:
         void glfwSetClipboardString(GLFWwindow* window, const char* string);
     """
+    if window is not None:
+        warnings.warn("The window parameter to glfwSetClipboardString is deprecated", DeprecationWarning, stacklevel=2)
     _glfw.glfwSetClipboardString(window, _to_char_p(string))
 
 _glfw.glfwGetClipboardString.restype = ctypes.c_char_p
@@ -2310,6 +2312,8 @@ def get_clipboard_string(window):
     Wrapper for:
         const char* glfwGetClipboardString(GLFWwindow* window);
     """
+    if window is not None:
+        warnings.warn("The window parameter to glfwSetClipboardString is deprecated", DeprecationWarning, stacklevel=2)
     return _glfw.glfwGetClipboardString(window)
 
 _glfw.glfwGetTime.restype = ctypes.c_double
@@ -2448,6 +2452,7 @@ if hasattr(_glfw, 'glfwSetCharModsCallback'):
         Wrapper for:
             GLFWcharmodsfun glfwSetCharModsCallback(GLFWwindow* window, GLFWcharmodsfun cbfun);
         """
+        warnings.warn("glfwSetCharModsCallback is scheduled for removal in GLFW 4.0", DeprecationWarning, stacklevel=2)
         window_addr = ctypes.cast(ctypes.pointer(window),
                                   ctypes.POINTER(ctypes.c_long)).contents.value
         if window_addr in _window_char_mods_callback_repository:
