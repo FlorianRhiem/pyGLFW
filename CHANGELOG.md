@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [2.5.6] - 2023-02-01
+- Added warnings for deprecated functions
+
 ## [2.5.5] - 2022-09-07
 - Added wrappers for unreleased macros
 - Fixed set_monitor_user_pointer and get_monitor_user_pointer
