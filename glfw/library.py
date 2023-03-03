@@ -142,7 +142,9 @@ def _get_library_search_paths():
 
     if sys.platform != 'darwin':
         # manylinux2014 wheels contain libraries built for X11 and Wayland
-        if os.environ.get('XDG_SESSION_TYPE') == 'wayland':
+        if os.environ.get('PYGLFW_LIBRARY_VARIANT', '').lower() in ['wayland', 'x11']:
+            search_paths.insert(1, os.path.join(package_path, os.environ['PYGLFW_LIBRARY_VARIANT'].lower()))
+        elif os.environ.get('XDG_SESSION_TYPE') == 'wayland':
             search_paths.insert(1, os.path.join(package_path, 'wayland'))
         else:
             # X11 is the default, even if XDG_SESSION_TYPE is not set
