@@ -58,7 +58,10 @@ the ``PYGLFW_LIBRARY`` environment variable to its path.
 Linux
 ~~~~~
 
-The GLFW shared library is included in the Python wheels for Linux.
+The GLFW shared library is included in the Python wheels for Linux. Although
+pyGLFW will try to detect whether the GLFW library for Wayland or X11 should
+be used, you can set the ``PYGLFW_LIBRARY_VARIANT`` variable to ``wayland`` or
+``x11`` to select either variant of the library.
 
 If you cannot use these on your system, you can install the GLFW shared
 library using a package management system (e.g. ``apt install libglfw3``

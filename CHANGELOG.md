@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [2.5.7] - 2023-03-15
+- Added support for PYGLFW_LIBRARY_VARIANT
+
 ## [2.5.6] - 2023-02-01
 - Added warnings for deprecated functions
 
