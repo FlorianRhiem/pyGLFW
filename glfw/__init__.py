@@ -652,6 +652,10 @@ if _PREVIEW:
     WAYLAND_APP_ID = 0x00026001
     CURSOR_CAPTURED = 0x00034004
 
+    WAYLAND_LIBDECOR = 0x00053001
+    WAYLAND_PREFER_LIBDECOR = 0x00038001
+    WAYLAND_DISABLE_LIBDECOR = 0x00038002
+
 _exc_info_from_callback = None
 def _callback_exception_decorator(func):
     @functools.wraps(func)
