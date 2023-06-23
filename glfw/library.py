@@ -93,9 +93,9 @@ def _glfw_get_version(filename):
     subprocess.
     """
     try:
-        multiprocessing.set_start_method('fork')
-        queue = multiprocessing.Queue()
-        process = multiprocessing.Process(target=_glfw_get_version_helper, args=(filename, queue))
+        context = multiprocessing.get_context('fork')
+        queue = context.Queue()
+        process = context.Process(target=_glfw_get_version_helper, args=(filename, queue))
         process.start()
         process.join()
         if queue.empty():
