@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [2.6.0] - 2023-06-23
+- Use multiprocessing for library version detection on non-Windows systems
+
 ## [2.5.9] - 2023-04-01
 - Fixed package version in CHANGELOG.md and glfw/__init__.py
 
