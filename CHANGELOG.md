@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [2.6.1] - 2023-06-23
+- Revert changes made in 2.6.0
+- Do not search for GLFW library when running in a frozen library
+
 ## [2.6.0] - 2023-06-23
 - Use multiprocessing for library version detection on non-Windows systems
 
