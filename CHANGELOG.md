@@ -6,7 +6,7 @@ For information on changes in GLFW itself, see the [GLFW version history](https:
 
 ## [2.6.1] - 2023-06-23
 - Revert changes made in 2.6.0
-- Do not search for GLFW library when running in a frozen library
+- Do not search for GLFW library when running in a frozen executable
 
 ## [2.6.0] - 2023-06-23
 - Use multiprocessing for library version detection on non-Windows systems
