@@ -9,7 +9,6 @@ from __future__ import unicode_literals
 import ctypes
 import os
 import glob
-import multiprocessing
 import sys
 import subprocess
 import textwrap
@@ -66,42 +65,58 @@ def _load_library(library_names, library_file_extensions,
     library_versions.sort()
     return ctypes.CDLL(library_versions[-1][1])
 
-def _glfw_get_version_helper(filename, queue):
-    """
-    Queries the library version tuple and puts it in a queue.
-    """
-    try:
-        library_handle = ctypes.CDLL(filename)
-    except OSError:
-        return
-    major_value = ctypes.c_int(0)
-    major = ctypes.pointer(major_value)
-    minor_value = ctypes.c_int(0)
-    minor = ctypes.pointer(minor_value)
-    rev_value = ctypes.c_int(0)
-    rev = ctypes.pointer(rev_value)
-    if hasattr(library_handle, 'glfwGetVersion'):
-        library_handle.glfwGetVersion(major, minor, rev)
-        version = (major_value.value,
-                   minor_value.value,
-                   rev_value.value)
-        queue.put(version)
 
 def _glfw_get_version(filename):
     """
     Queries and returns the library version tuple or None by using a
     subprocess.
     """
-    try:
-        context = multiprocessing.get_context('fork')
-        queue = context.Queue()
-        process = context.Process(target=_glfw_get_version_helper, args=(filename, queue))
-        process.start()
-        process.join()
-        if queue.empty():
-            return None
-        return queue.get()
-    except multiprocessing.ProcessError:
+    version_checker_source = '''
+        import sys
+        import ctypes
+
+        def get_version(library_handle):
+            """
+            Queries and returns the library version tuple or None.
+            """
+            major_value = ctypes.c_int(0)
+            major = ctypes.pointer(major_value)
+            minor_value = ctypes.c_int(0)
+            minor = ctypes.pointer(minor_value)
+            rev_value = ctypes.c_int(0)
+            rev = ctypes.pointer(rev_value)
+            if hasattr(library_handle, 'glfwGetVersion'):
+                library_handle.glfwGetVersion(major, minor, rev)
+                version = (major_value.value,
+                           minor_value.value,
+                           rev_value.value)
+                return version
+            else:
+                return None
+
+        try:
+            input_func = raw_input
+        except NameError:
+            input_func = input
+        filename = input_func().strip()
+
+        try:
+            library_handle = ctypes.CDLL(filename)
+        except OSError:
+            pass
+        else:
+            version = get_version(library_handle)
+            print(version)
+    '''
+
+    args = [sys.executable, '-c', textwrap.dedent(version_checker_source)]
+    process = subprocess.Popen(args, universal_newlines=True,
+                               stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    out = process.communicate(filename)[0]
+    out = out.strip()
+    if out:
+        return eval(out)
+    else:
         return None
 
 
