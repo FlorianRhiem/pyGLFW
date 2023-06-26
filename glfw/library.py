@@ -192,6 +192,8 @@ elif sys.platform == 'win32':
             glfw = ctypes.CDLL(os.path.join(sys.prefix, 'Library', 'bin', 'glfw3.dll'))
         except OSError:
             pass
-else:
+elif not getattr(sys, "frozen", False):
     glfw = _load_library(['glfw', 'glfw3'], ['.so', '.dylib'],
                           _get_library_search_paths(), _glfw_get_version)
+else:
+    glfw = None
