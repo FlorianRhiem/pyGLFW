@@ -76,9 +76,10 @@ the ``PYGLFW_LIBRARY`` environment variable to its path.
 cx_Freeze / PyInstaller
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-pyGLFW is unable to dynamically search for the GLFW library on non-Windows platforms if
-running in an executable frozen with cx_Freeze or PyInstaller, so a path to the library
-must be provided using the ``PYGLFW_LIBRARY`` environment variable.
+pyGLFW will search for the GLFW library in the current working directory, the directory
+of the executable and in the package on non-Windows platforms if running in an
+executable frozen with cx_Freeze or PyInstaller, unless the ``PYGLFW_LIBRARY``
+environment variable is set.
 
 Development Version
 ~~~~~~~~~~~~~~~~~~~
