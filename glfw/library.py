@@ -22,28 +22,29 @@ def _find_library_candidates(library_names,
     """
     candidates = []
     for search_path in library_search_paths:
-        if search_path:
-            for library_name in library_names:
-                glob_query = os.path.join(search_path, '*'+library_name+'*')
-                for filename in glob.iglob(glob_query):
-                    filename = os.path.realpath(filename)
-                    if filename in candidates:
-                        continue
-                    basename = os.path.basename(filename)
-                    if basename.startswith('lib'+library_name):
-                        basename_end = basename[len('lib'+library_name):]
-                    elif basename.startswith(library_name):
-                        basename_end = basename[len(library_name):]
-                    else:
-                        continue
-                    for file_extension in library_file_extensions:
-                        if basename_end.startswith(file_extension):
-                            if basename_end[len(file_extension):][:1] in ('', '.'):
-                                candidates.append(filename)
-                        if basename_end.endswith(file_extension):
-                            basename_middle = basename_end[:-len(file_extension)]
-                            if all(c in '0123456789.' for c in basename_middle):
-                                candidates.append(filename)
+        if not search_path:
+            continue
+        for library_name in library_names:
+            glob_query = os.path.join(search_path, '*'+library_name+'.*')
+            for filename in glob.iglob(glob_query):
+                filename = os.path.realpath(filename)
+                if filename in candidates:
+                    continue
+                basename = os.path.basename(filename)
+                if basename.startswith('lib'+library_name):
+                    basename_end = basename[len('lib'+library_name):]
+                elif basename.startswith(library_name):
+                    basename_end = basename[len(library_name):]
+                else:
+                    continue
+                for file_extension in library_file_extensions:
+                    if basename_end.startswith(file_extension):
+                        if basename_end[len(file_extension):][:1] in ('', '.'):
+                            candidates.append(filename)
+                    elif basename_end.endswith(file_extension):
+                        basename_middle = basename_end[:-len(file_extension)]
+                        if all(c in '0123456789.' for c in basename_middle):
+                            candidates.append(filename)
     return candidates
 
 
@@ -196,10 +197,10 @@ def _get_frozen_library_search_paths():
     package_path = os.path.abspath(os.path.dirname(__file__))
     package_path_variant = _get_package_path_variant(package_path)
     return [
-        current_path,
         executable_path,
         package_path_variant,
-        package_path
+        package_path,
+        current_path
     ]
 
 
