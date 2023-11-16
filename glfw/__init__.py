@@ -995,6 +995,8 @@ if hasattr(_glfw, 'glfwGetMonitorWorkarea'):
     _glfw.glfwGetMonitorWorkarea.restype = None
     _glfw.glfwGetMonitorWorkarea.argtypes = [ctypes.POINTER(_GLFWmonitor),
                                         ctypes.POINTER(ctypes.c_int),
+                                        ctypes.POINTER(ctypes.c_int),
+                                        ctypes.POINTER(ctypes.c_int),
                                         ctypes.POINTER(ctypes.c_int)]
 
 
