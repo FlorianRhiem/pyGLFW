@@ -41,6 +41,8 @@ The GLFW shared library and Visual C++ runtime are included in the Python wheels
 
 To use a different GLFW library, you can set ``PYGLFW_LIBRARY`` to its location.
 
+Several pre built `python-glfw <https://packages.msys2.org/base/mingw-w64-python-glfw>`__ binary packages available for installation via `MSYS2 <https://www.msys2.org/>`__ distro.
+
 macOS
 ~~~~~
 
