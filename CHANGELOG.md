@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+
+## [2.6.3] - 2023-11-17
+- Fixed wrapper for glfwGetMonitorWorkarea
+
 ## [2.6.2] - 2023-06-30
 - Implemented search for GLFW library specific to frozen executables
 
