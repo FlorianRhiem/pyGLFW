@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
 
+## [2.6.4] - 2023-12-16
+- Updated to GLFW 3.3.9
+
 ## [2.6.3] - 2023-11-17
 - Fixed wrapper for glfwGetMonitorWorkarea
 
