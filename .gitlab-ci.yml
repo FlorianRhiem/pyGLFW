@@ -1,5 +1,5 @@
 variables:
-    GLFW_VERSION: "3.3.8"
+    GLFW_VERSION: "3.3.9"
 
 stages:
 - build
