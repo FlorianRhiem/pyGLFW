@@ -129,9 +129,9 @@ def _glfw_get_version(filename):
             else:
                 return None
 
-        try:
+        if sys.version_info[0] == 2:
             input_func = raw_input
-        except NameError:
+        else:
             input_func = input
         filename = input_func().strip()
 
