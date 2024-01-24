@@ -130,9 +130,9 @@ def _glfw_get_version(filename):
                 return None
 
         try:
-            input_func = raw_input
-        except NameError:
             input_func = input
+        except NameError:
+            input_func = raw_input
         filename = input_func().strip()
 
         try:
