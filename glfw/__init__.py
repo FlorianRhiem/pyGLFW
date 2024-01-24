@@ -7,9 +7,9 @@ from __future__ import division
 from __future__ import unicode_literals
 
 __author__ = 'Florian Rhiem (florian.rhiem@gmail.com)'
-__copyright__ = 'Copyright (c) 2013-2023 Florian Rhiem'
+__copyright__ = 'Copyright (c) 2013-2024 Florian Rhiem'
 __license__ = 'MIT'
-__version__ = '2.6.4'
+__version__ = '2.6.5'
 
 # By default, GLFW errors will be handled by a pre-defined error callback.
 # Depending on the value of ERROR_REPORTING, this callback will:
