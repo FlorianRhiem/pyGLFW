@@ -656,6 +656,9 @@ if _PREVIEW:
     WAYLAND_PREFER_LIBDECOR = 0x00038001
     WAYLAND_DISABLE_LIBDECOR = 0x00038002
 
+    WIN32_SHOWDEFAULT = 0x00025002
+    SCALE_FRAMEBUFFER = 0x0002200D
+
 _exc_info_from_callback = None
 def _callback_exception_decorator(func):
     @functools.wraps(func)

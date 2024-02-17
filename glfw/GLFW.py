@@ -456,6 +456,8 @@ if _PREVIEW:
         WAYLAND_LIBDECOR as GLFW_WAYLAND_LIBDECOR,
         WAYLAND_PREFER_LIBDECOR as GLFW_WAYLAND_PREFER_LIBDECOR,
         WAYLAND_DISABLE_LIBDECOR as GLFW_WAYLAND_DISABLE_LIBDECOR,
+        WIN32_SHOWDEFAULT as GLFW_WIN32_SHOWDEFAULT,
+        SCALE_FRAMEBUFFER as GLFW_SCALE_FRAMEBUFFER,
         init_allocator as glfwInitAllocator,
         init_vulkan_loader as glfwInitVulkanLoader,
         get_platform as glfwGetPlatform,
