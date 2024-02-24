@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [2.7.0] - 2024-02-24
+- Included GLFW 3.4 functions and definitions without preview
 
 ## [2.6.5] - 2024-01-24
 - Fixed Python version check
