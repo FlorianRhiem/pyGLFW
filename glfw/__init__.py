@@ -321,8 +321,8 @@ class _GLFWgamepadstate(ctypes.Structure):
 
 
 VERSION_MAJOR = 3
-VERSION_MINOR = 3
-VERSION_REVISION = 4
+VERSION_MINOR = 4
+VERSION_REVISION = 0
 TRUE = 1
 FALSE = 0
 RELEASE = 0
@@ -532,6 +532,10 @@ VERSION_UNAVAILABLE = 0x00010007
 PLATFORM_ERROR = 0x00010008
 FORMAT_UNAVAILABLE = 0x00010009
 NO_WINDOW_CONTEXT = 0x0001000A
+CURSOR_UNAVAILABLE = 0x0001000B
+FEATURE_UNAVAILABLE = 0x0001000C
+FEATURE_UNIMPLEMENTED = 0x0001000D
+PLATFORM_UNAVAILABLE = 0x0001000E
 FOCUSED = 0x00020001
 ICONIFIED = 0x00020002
 RESIZABLE = 0x00020003
@@ -544,6 +548,9 @@ CENTER_CURSOR = 0x00020009
 TRANSPARENT_FRAMEBUFFER = 0x0002000A
 HOVERED = 0x0002000B
 FOCUS_ON_SHOW = 0x0002000C
+MOUSE_PASSTHROUGH = 0x0002000D
+POSITION_X = 0x0002000E
+POSITION_Y = 0x0002000F
 RED_BITS = 0x00021001
 GREEN_BITS = 0x00021002
 BLUE_BITS = 0x00021003
@@ -567,16 +574,21 @@ CONTEXT_REVISION = 0x00022004
 CONTEXT_ROBUSTNESS = 0x00022005
 OPENGL_FORWARD_COMPAT = 0x00022006
 OPENGL_DEBUG_CONTEXT = 0x00022007
+CONTEXT_DEBUG = 0x00022007
 OPENGL_PROFILE = 0x00022008
 CONTEXT_RELEASE_BEHAVIOR = 0x00022009
 CONTEXT_NO_ERROR = 0x0002200A
 CONTEXT_CREATION_API = 0x0002200B
 SCALE_TO_MONITOR = 0x0002200C
+SCALE_FRAMEBUFFER = 0x0002200D
 COCOA_RETINA_FRAMEBUFFER = 0x00023001
 COCOA_FRAME_NAME = 0x00023002
 COCOA_GRAPHICS_SWITCHING = 0x00023003
 X11_CLASS_NAME = 0x00024001
 X11_INSTANCE_NAME = 0x00024002
+WIN32_KEYBOARD_MENU = 0x00025001
+WIN32_SHOWDEFAULT = 0x00025002
+WAYLAND_APP_ID = 0x00026001
 NO_API = 0
 OPENGL_API = 0x00030001
 OPENGL_ES_API = 0x00030002
@@ -594,6 +606,7 @@ RAW_MOUSE_MOTION = 0x00033005
 CURSOR_NORMAL = 0x00034001
 CURSOR_HIDDEN = 0x00034002
 CURSOR_DISABLED = 0x00034003
+CURSOR_CAPTURED = 0x00034004
 ANY_RELEASE_BEHAVIOR = 0
 RELEASE_BEHAVIOR_FLUSH = 0x00035001
 RELEASE_BEHAVIOR_NONE = 0x00035002
@@ -604,60 +617,42 @@ ARROW_CURSOR = 0x00036001
 IBEAM_CURSOR = 0x00036002
 CROSSHAIR_CURSOR = 0x00036003
 HAND_CURSOR = 0x00036004
+POINTING_HAND_CURSOR = 0x00036004
 HRESIZE_CURSOR = 0x00036005
+RESIZE_EW_CURSOR = 0x00036005
 VRESIZE_CURSOR = 0x00036006
+RESIZE_NS_CURSOR = 0x00036006
+RESIZE_NWSE_CURSOR = 0x00036007
+RESIZE_NESW_CURSOR = 0x00036008
+RESIZE_ALL_CURSOR = 0x00036009
+NOT_ALLOWED_CURSOR = 0x0003600A
+ANGLE_PLATFORM_TYPE_NONE = 0x00037001
+ANGLE_PLATFORM_TYPE_OPENGL = 0x00037002
+ANGLE_PLATFORM_TYPE_OPENGLES = 0x00037003
+ANGLE_PLATFORM_TYPE_D3D9 = 0x00037004
+ANGLE_PLATFORM_TYPE_D3D11 = 0x00037005
+ANGLE_PLATFORM_TYPE_VULKAN = 0x00037007
+ANGLE_PLATFORM_TYPE_METAL = 0x00037008
+WAYLAND_PREFER_LIBDECOR = 0x00038001
+WAYLAND_DISABLE_LIBDECOR = 0x00038002
 CONNECTED = 0x00040001
 DISCONNECTED = 0x00040002
 JOYSTICK_HAT_BUTTONS = 0x00050001
+ANGLE_PLATFORM_TYPE = 0x00050002
+PLATFORM = 0x00050003
 COCOA_CHDIR_RESOURCES = 0x00051001
 COCOA_MENUBAR = 0x00051002
+X11_XCB_VULKAN_SURFACE = 0x00052001
+WAYLAND_LIBDECOR = 0x00053001
+ANY_PLATFORM = 0x00060000
+PLATFORM_WIN32 = 0x00060001
+PLATFORM_COCOA = 0x00060002
+PLATFORM_WAYLAND = 0x00060003
+PLATFORM_X11 = 0x00060004
+PLATFORM_NULL = 0x00060005
+ANY_POSITION = 0x80000000
 DONT_CARE = -1
 
-
-if _PREVIEW:
-    ANGLE_PLATFORM_TYPE = 0x00050002
-    ANGLE_PLATFORM_TYPE_NONE = 0x00037001
-    ANGLE_PLATFORM_TYPE_OPENGL = 0x00037002
-    ANGLE_PLATFORM_TYPE_OPENGLES = 0x00037003
-    ANGLE_PLATFORM_TYPE_D3D9 = 0x00037004
-    ANGLE_PLATFORM_TYPE_D3D11 = 0x00037005
-    ANGLE_PLATFORM_TYPE_VULKAN = 0x00037007
-    ANGLE_PLATFORM_TYPE_METAL = 0x00037008
-    ANY_PLATFORM = 0x00060000
-    CONTEXT_DEBUG = 0x00022007
-    CURSOR_UNAVAILABLE = 0x0001000B
-    FEATURE_UNAVAILABLE = 0x0001000C
-    FEATURE_UNIMPLEMENTED = 0x0001000D
-    MOUSE_PASSTHROUGH = 0x0002000D
-    NOT_ALLOWED_CURSOR = 0x0003600A
-    PLATFORM = 0x00050003
-    PLATFORM_COCOA = 0x00060002
-    PLATFORM_NULL = 0x00060005
-    PLATFORM_UNAVAILABLE = 0x0001000E
-    PLATFORM_WAYLAND = 0x00060003
-    PLATFORM_WIN32 = 0x00060001
-    PLATFORM_X11 = 0x00060004
-    POINTING_HAND_CURSOR = 0x00036004
-    RESIZE_ALL_CURSOR = 0x00036009
-    RESIZE_EW_CURSOR = 0x00036005
-    RESIZE_NESW_CURSOR = 0x00036008
-    RESIZE_NS_CURSOR = 0x00036006
-    RESIZE_NWSE_CURSOR = 0x00036007
-    WIN32_KEYBOARD_MENU = 0x00025001
-    X11_XCB_VULKAN_SURFACE = 0x00052001
-
-    ANY_POSITION = 0x80000000
-    POSITION_X = 0x0002000E
-    POSITION_Y = 0x0002000F
-    WAYLAND_APP_ID = 0x00026001
-    CURSOR_CAPTURED = 0x00034004
-
-    WAYLAND_LIBDECOR = 0x00053001
-    WAYLAND_PREFER_LIBDECOR = 0x00038001
-    WAYLAND_DISABLE_LIBDECOR = 0x00038002
-
-    WIN32_SHOWDEFAULT = 0x00025002
-    SCALE_FRAMEBUFFER = 0x0002200D
 
 _exc_info_from_callback = None
 def _callback_exception_decorator(func):
@@ -778,28 +773,28 @@ _GLFWjoystickfun = ctypes.CFUNCTYPE(None,
                                     ctypes.c_int,
                                     ctypes.c_int)
 
-if _PREVIEW:
-    _GLFWallocatefun = ctypes.CFUNCTYPE(ctypes.c_void_p,
-                                          ctypes.c_size_t,
-                                          ctypes.c_void_p)
-    _GLFWreallocatefun = ctypes.CFUNCTYPE(ctypes.c_void_p,
-                                          ctypes.c_void_p,
-                                          ctypes.c_size_t,
-                                          ctypes.c_void_p)
-    _GLFWdeallocatefun = ctypes.CFUNCTYPE(None,
-                                          ctypes.c_void_p,
-                                          ctypes.c_void_p)
+_GLFWallocatefun = ctypes.CFUNCTYPE(ctypes.c_void_p,
+                                      ctypes.c_size_t,
+                                      ctypes.c_void_p)
+_GLFWreallocatefun = ctypes.CFUNCTYPE(ctypes.c_void_p,
+                                      ctypes.c_void_p,
+                                      ctypes.c_size_t,
+                                      ctypes.c_void_p)
+_GLFWdeallocatefun = ctypes.CFUNCTYPE(None,
+                                      ctypes.c_void_p,
+                                      ctypes.c_void_p)
 
-    class _GLFWallocator(ctypes.Structure):
-        """
-        Wrapper for:
-            typedef struct GLFWallocator GLFWallocator;
-        """
-        _fields_ = [
-            ("allocate", _GLFWallocatefun),
-            ("reallocate", _GLFWreallocatefun),
-            ("deallocate", _GLFWdeallocatefun),
-        ]
+
+class _GLFWallocator(ctypes.Structure):
+    """
+    Wrapper for:
+        typedef struct GLFWallocator GLFWallocator;
+    """
+    _fields_ = [
+        ("allocate", _GLFWallocatefun),
+        ("reallocate", _GLFWreallocatefun),
+        ("deallocate", _GLFWdeallocatefun),
+    ]
 
 
 _glfw.glfwInit.restype = ctypes.c_int
@@ -2719,7 +2714,6 @@ if hasattr(_glfw, 'glfwSetWindowIcon'):
                                         ctypes.c_int,
                                         ctypes.POINTER(_GLFWimage)]
 
-
     def set_window_icon(window, count, images):
         """
         Sets the icon for the specified window.
@@ -2741,7 +2735,6 @@ if hasattr(_glfw, 'glfwSetWindowSizeLimits'):
     _glfw.glfwSetWindowSizeLimits.argtypes = [ctypes.POINTER(_GLFWwindow),
                                               ctypes.c_int, ctypes.c_int,
                                               ctypes.c_int, ctypes.c_int]
-
 
     def set_window_size_limits(window,
                                minwidth, minheight,
@@ -3206,87 +3199,101 @@ if hasattr(_glfw, 'glfwGetOSMesaContext'):
         """
         return _glfw.glfwGetOSMesaContext(window)
 
-if _PREVIEW:
-    if hasattr(_glfw, 'glfwInitAllocator'):
-        _allocate_callback = None
-        _reallocate_callback = None
-        _deallocate_callback = None
-        _glfw.glfwInitAllocator.restype = None
-        _glfw.glfwInitAllocator.argtypes = [ctypes.POINTER(_GLFWallocator)]
-        def init_allocator(allocate, reallocate, deallocate):
-            """
-            Sets the init allocator to the desired value.
+if hasattr(_glfw, 'glfwInitAllocator'):
+    _allocate_callback = None
+    _reallocate_callback = None
+    _deallocate_callback = None
+    _glfw.glfwInitAllocator.restype = None
+    _glfw.glfwInitAllocator.argtypes = [ctypes.POINTER(_GLFWallocator)]
+    def init_allocator(allocate, reallocate, deallocate):
+        """
+        Sets the init allocator to the desired value.
 
-            Wrapper for:
-                void glfwInitAllocator(const GLFWallocator* allocator);
-            """
-            global _allocate_callback
-            global _reallocate_callback
-            global _deallocate_callback
-            if allocate is None and reallocate is None and deallocate is None:
-                allocator_ptr = ctypes.POINTER(_GLFWallocator)(0)
-            else:
-                if allocate is None:
-                    allocate = 0
-                c_allocate = _GLFWallocatefun(allocate)
-                _allocate_callback = (allocate, c_allocate)
-                if reallocate is None:
-                    reallocate = 0
-                c_reallocate = _GLFWreallocatefun(reallocate)
-                _reallocate_callback = (reallocate, c_reallocate)
-                if deallocate is None:
-                    deallocate = 0
-                c_deallocate = _GLFWdeallocatefun(deallocate)
-                _deallocate_callback = (deallocate, c_deallocate)
-                allocator = _GLFWallocator()
-                allocator.allocate = c_allocate
-                allocator.reallocate = c_reallocate
-                allocator.deallocate = c_deallocate
-                allocator_ptr = ctypes.byref(allocator)
-            _glfw.glfwInitAllocator(allocator_ptr)
+        Wrapper for:
+            void glfwInitAllocator(const GLFWallocator* allocator);
+        """
+        global _allocate_callback
+        global _reallocate_callback
+        global _deallocate_callback
+        if allocate is None and reallocate is None and deallocate is None:
+            allocator_ptr = ctypes.POINTER(_GLFWallocator)(0)
+        else:
+            if allocate is None:
+                allocate = 0
+            c_allocate = _GLFWallocatefun(allocate)
+            _allocate_callback = (allocate, c_allocate)
+            if reallocate is None:
+                reallocate = 0
+            c_reallocate = _GLFWreallocatefun(reallocate)
+            _reallocate_callback = (reallocate, c_reallocate)
+            if deallocate is None:
+                deallocate = 0
+            c_deallocate = _GLFWdeallocatefun(deallocate)
+            _deallocate_callback = (deallocate, c_deallocate)
+            allocator = _GLFWallocator()
+            allocator.allocate = c_allocate
+            allocator.reallocate = c_reallocate
+            allocator.deallocate = c_deallocate
+            allocator_ptr = ctypes.byref(allocator)
+        _glfw.glfwInitAllocator(allocator_ptr)
 
-    if hasattr(_glfw, 'glfwInitVulkanLoader'):
-        _loader_callback = None
-        _loader_callback_type = ctypes.CFUNCTYPE(ctypes.c_void_p, ctypes.c_void_p, ctypes.c_char_p)
-        _glfw.glfwInitVulkanLoader.restype = None
-        _glfw.glfwInitVulkanLoader.argtypes = [_loader_callback_type]
-        def init_vulkan_loader(loader):
-            """
-            Sets the desired Vulkan `vkGetInstanceProcAddr` function.
+if hasattr(_glfw, 'glfwInitVulkanLoader'):
+    _loader_callback = None
+    _loader_callback_type = ctypes.CFUNCTYPE(ctypes.c_void_p, ctypes.c_void_p, ctypes.c_char_p)
+    _glfw.glfwInitVulkanLoader.restype = None
+    _glfw.glfwInitVulkanLoader.argtypes = [_loader_callback_type]
+    def init_vulkan_loader(loader):
+        """
+        Sets the desired Vulkan `vkGetInstanceProcAddr` function.
 
-            Wrapper for:
-                void glfwInitVulkanLoader(PFN_vkGetInstanceProcAddr loader);
-            """
-            global _loader_callback
-            if loader is None:
-                loader = 0
-            c_loader = _loader_callback_type(loader)
-            _loader_callback = (loader, c_loader)
-            _glfw.glfwInitVulkanLoader(c_loader)
+        Wrapper for:
+            void glfwInitVulkanLoader(PFN_vkGetInstanceProcAddr loader);
+        """
+        global _loader_callback
+        if loader is None:
+            loader = 0
+        c_loader = _loader_callback_type(loader)
+        _loader_callback = (loader, c_loader)
+        _glfw.glfwInitVulkanLoader(c_loader)
 
-    if hasattr(_glfw, 'glfwGetPlatform'):
-        _glfw.glfwGetPlatform.restype = ctypes.c_int
-        _glfw.glfwGetPlatform.argtypes = []
-        def get_platform():
-            """
-            Returns the currently selected platform.
+if hasattr(_glfw, 'glfwGetPlatform'):
+    _glfw.glfwGetPlatform.restype = ctypes.c_int
+    _glfw.glfwGetPlatform.argtypes = []
+    def get_platform():
+        """
+        Returns the currently selected platform.
 
-            Wrapper for:
-                int glfwGetPlatform(void);
-            """
-            return _glfw.glfwGetPlatform()
+        Wrapper for:
+            int glfwGetPlatform(void);
+        """
+        return _glfw.glfwGetPlatform()
 
-    if hasattr(_glfw, 'glfwPlatformSupported'):
-        _glfw.glfwPlatformSupported.restype = ctypes.c_int
-        _glfw.glfwPlatformSupported.argtypes = [ctypes.c_int]
-        def platform_supported(platform):
-            """
-            Returns whether the library includes support for the specified platform.
+if hasattr(_glfw, 'glfwPlatformSupported'):
+    _glfw.glfwPlatformSupported.restype = ctypes.c_int
+    _glfw.glfwPlatformSupported.argtypes = [ctypes.c_int]
+    def platform_supported(platform):
+        """
+        Returns whether the library includes support for the specified platform.
 
-            Wrapper for:
-                int glfwPlatformSupported(int platform);
-            """
-            return _glfw.glfwPlatformSupported(platform)
+        Wrapper for:
+            int glfwPlatformSupported(int platform);
+        """
+        return _glfw.glfwPlatformSupported(platform)
+
+if hasattr(_glfw, 'glfwGetWindowTitle'):
+    _glfw.glfwGetWindowTitle.restype = ctypes.c_char_p
+    _glfw.glfwGetWindowTitle.argtypes = [ctypes.POINTER(_GLFWwindow)]
+    def get_window_title(window):
+        """
+        Returns the title of the specified window.
+
+        Wrapper for:
+            const char* glfwGetWindowTitle(GLFWwindow* window);
+        """
+        window_title = _glfw.glfwGetWindowTitle(window)
+        if window_title:
+            return window_title.decode('utf-8')
+        return None
 
 
 _prepare_errcheck()
