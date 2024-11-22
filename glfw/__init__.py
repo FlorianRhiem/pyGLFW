@@ -653,6 +653,9 @@ PLATFORM_NULL = 0x00060005
 ANY_POSITION = 0x80000000
 DONT_CARE = -1
 
+if _PREVIEW:
+    UNLIMITED_MOUSE_BUTTONS = 0x00033006
+
 
 _exc_info_from_callback = None
 def _callback_exception_decorator(func):

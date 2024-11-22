@@ -466,3 +466,9 @@ if hasattr(_glfw, 'glfwPlatformSupported'):
     from . import platform_supported as glfwPlatformSupported
 if hasattr(_glfw, 'glfwGetWindowTitle'):
     from . import get_window_title as glfwGetWindowTitle
+
+from . import _PREVIEW
+if _PREVIEW:
+    from . import (
+        UNLIMITED_MOUSE_BUTTONS as GLFW_UNLIMITED_MOUSE_BUTTONS
+    )
