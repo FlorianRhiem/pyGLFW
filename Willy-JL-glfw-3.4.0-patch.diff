@@ -1,0 +1,61 @@
+diff -ur glfw-3.4/examples/particles.c glfw-3.4-fork/examples/particles.c
+--- glfw-3.4/examples/particles.c	2024-11-22 13:22:48
++++ glfw-3.4-fork/examples/particles.c	2024-11-22 13:22:29
+@@ -24,6 +24,8 @@
+ //
+ //========================================================================
+ 
++#define _GNU_SOURCE
++
+ #if defined(_MSC_VER)
+  // Make MS math.h define M_PI
+  #define _USE_MATH_DEFINES
+diff -ur glfw-3.4/src/linux_joystick.c glfw-3.4-fork/src/linux_joystick.c
+--- glfw-3.4/src/linux_joystick.c	2024-11-22 13:22:48
++++ glfw-3.4-fork/src/linux_joystick.c	2024-11-22 13:22:29
+@@ -25,6 +25,8 @@
+ //
+ //========================================================================
+ 
++#define _GNU_SOURCE
++
+ #include "internal.h"
+ 
+ #if defined(GLFW_BUILD_LINUX_JOYSTICK)
+diff -ur glfw-3.4/src/posix_time.c glfw-3.4-fork/src/posix_time.c
+--- glfw-3.4/src/posix_time.c	2024-11-22 13:22:48
++++ glfw-3.4-fork/src/posix_time.c	2024-11-22 13:22:29
+@@ -25,6 +25,8 @@
+ //
+ //========================================================================
+ 
++#define _GNU_SOURCE
++
+ #include "internal.h"
+ 
+ #if defined(GLFW_BUILD_POSIX_TIMER)
+diff -ur glfw-3.4/src/wl_init.c glfw-3.4-fork/src/wl_init.c
+--- glfw-3.4/src/wl_init.c	2024-11-22 13:22:48
++++ glfw-3.4-fork/src/wl_init.c	2024-11-22 13:22:29
+@@ -24,6 +24,8 @@
+ //
+ //========================================================================
+ 
++#define _GNU_SOURCE
++
+ #include "internal.h"
+ 
+ #if defined(_GLFW_WAYLAND)
+diff -ur glfw-3.4/src/wl_window.c glfw-3.4-fork/src/wl_window.c
+--- glfw-3.4/src/wl_window.c	2024-11-22 13:22:48
++++ glfw-3.4-fork/src/wl_window.c	2024-11-22 13:22:29
+@@ -40,7 +40,9 @@
+ #include <sys/mman.h>
+ #include <sys/timerfd.h>
+ #include <poll.h>
++#if __has_include(<linux/input-event-codes.h>)
+ #include <linux/input-event-codes.h>
++#endif
+ 
+ #include "wayland-client-protocol.h"
+ #include "xdg-shell-client-protocol.h"

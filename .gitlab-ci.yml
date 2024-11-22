@@ -1,9 +1,91 @@
 variables:
-    GLFW_VERSION: "3.3.9"
+    GLFW_VERSION: "3.4"
 
 stages:
 - build
 - package
+
+build-manylinux_2_28-x86_64:
+  stage: build
+  image: quay.io/pypa/manylinux_2_28_x86_64
+  script:
+  # Download GLFW from source
+  - curl -LO https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.zip
+  - unzip glfw-${GLFW_VERSION}.zip
+  # Install cmake
+  - curl -LO https://github.com/Kitware/CMake/releases/download/v3.28.3/cmake-3.28.3-Linux-x86_64.tar.gz
+  - tar xzf cmake-3.28.3-Linux-x86_64.tar.gz
+  - mv cmake-3.28.3-linux-x86_64 cmake
+  # Install build dependencies for X11
+  - yum install -y libXinerama-devel libXrandr-devel libXcursor-devel libXi-devel
+  # Build GLFW for X11
+  - mkdir build_x11
+  - cd build_x11
+  - ../cmake/bin/cmake ../glfw-${GLFW_VERSION} -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DGLFW_BUILD_X11=ON -DGLFW_BUILD_WAYLAND=OFF
+  - make
+  - mkdir -p ../artifacts-manylinux_2_28-x86_64/x11
+  - cp src/libglfw.so ../artifacts-manylinux_2_28-x86_64/x11/libglfw.so
+  - cd ..
+  # Install build dependencies for Wayland
+  - yum install -y libwayland-client-devel libxkbcommon-devel
+  - curl -LO https://wayland.freedesktop.org/releases/wayland-protocols-1.17.tar.xz
+  - tar xf wayland-protocols-1.17.tar.xz
+  - cd wayland-protocols-1.17
+  - ./configure
+  - make install
+  - cd ..
+  # Build GLFW for Wayland
+  - mkdir build_wayland
+  - cd build_wayland
+  - PKG_CONFIG_PATH=/usr/local/share/pkgconfig ../cmake/bin/cmake ../glfw-${GLFW_VERSION} -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DGLFW_BUILD_X11=OFF -DGLFW_BUILD_WAYLAND=ON
+  - make
+  - mkdir -p ../artifacts-manylinux_2_28-x86_64/wayland
+  - cp src/libglfw.so ../artifacts-manylinux_2_28-x86_64/wayland/libglfw.so
+  artifacts:
+    paths:
+    - artifacts-manylinux_2_28-x86_64
+
+build-manylinux_2_28-aarch64:
+  stage: build
+  image: quay.io/pypa/manylinux_2_28_aarch64
+  script:
+  # Download GLFW from source
+  - curl -LO https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.zip
+  - unzip glfw-${GLFW_VERSION}.zip
+  # Install cmake
+  - curl -LO https://github.com/Kitware/CMake/releases/download/v3.28.3/cmake-3.28.3-linux-aarch64.tar.gz
+  - tar xzf cmake-3.28.3-linux-aarch64.tar.gz
+  - mv cmake-3.28.3-linux-aarch64 cmake
+  # Install build dependencies for X11
+  - yum install -y libXinerama-devel libXrandr-devel libXcursor-devel libXi-devel
+  # Build GLFW for X11
+  - mkdir build_x11
+  - cd build_x11
+  - ../cmake/bin/cmake ../glfw-${GLFW_VERSION} -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DGLFW_BUILD_X11=ON -DGLFW_BUILD_WAYLAND=OFF
+  - make
+  - mkdir -p ../artifacts-manylinux_2_28-aarch64/x11
+  - cp src/libglfw.so ../artifacts-manylinux_2_28-aarch64/x11/libglfw.so
+  - cd ..
+  # Install build dependencies for Wayland
+  - yum install -y epel-release
+  - yum install -y libwayland-client-devel libxkbcommon-devel
+  - curl -LO https://wayland.freedesktop.org/releases/wayland-protocols-1.17.tar.xz
+  - tar xf wayland-protocols-1.17.tar.xz
+  - cd wayland-protocols-1.17
+  - ./configure
+  - make install
+  - cd ..
+  # Build GLFW for Wayland
+  - mkdir build_wayland
+  - cd build_wayland
+  - PKG_CONFIG_PATH=/usr/local/share/pkgconfig ../cmake/bin/cmake ../glfw-${GLFW_VERSION} -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DGLFW_BUILD_X11=OFF -DGLFW_BUILD_WAYLAND=ON
+  - make
+  - mkdir -p ../artifacts-manylinux_2_28-aarch64/wayland
+  - cp src/libglfw.so ../artifacts-manylinux_2_28-aarch64/wayland/libglfw.so
+  artifacts:
+    paths:
+    - artifacts-manylinux_2_28-aarch64
+
 
 build-manylinux2014-x86_64:
   stage: build
@@ -12,16 +94,18 @@ build-manylinux2014-x86_64:
   # Download GLFW from source
   - curl -LO https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.zip
   - unzip glfw-${GLFW_VERSION}.zip
+  # Patch GLFW 3.4 to be compatible with manylinux2014
+  - patch -p0 -i Willy-JL-glfw-3.4.0-patch.diff
   # Install cmake
-  - curl -LO https://github.com/Kitware/CMake/releases/download/v3.1.3/cmake-3.1.3-Linux-x86_64.tar.gz
-  - tar xzf cmake-3.1.3-Linux-x86_64.tar.gz
-  - mv cmake-3.1.3-Linux-x86_64 cmake
+  - curl -LO https://github.com/Kitware/CMake/releases/download/v3.28.3/cmake-3.28.3-Linux-x86_64.tar.gz
+  - tar xzf cmake-3.28.3-Linux-x86_64.tar.gz
+  - mv cmake-3.28.3-linux-x86_64 cmake
   # Install build dependencies for X11
   - yum install -y libXinerama-devel libXrandr-devel libXcursor-devel libXi-devel
   # Build GLFW for X11
   - mkdir build_x11
   - cd build_x11
-  - ../cmake/bin/cmake ../glfw-${GLFW_VERSION} -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF
+  - ../cmake/bin/cmake ../glfw-${GLFW_VERSION} -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DGLFW_BUILD_X11=ON -DGLFW_BUILD_WAYLAND=OFF
   - make
   - mkdir -p ../artifacts-manylinux2014-x86_64/x11
   - cp src/libglfw.so ../artifacts-manylinux2014-x86_64/x11/libglfw.so
@@ -37,7 +121,7 @@ build-manylinux2014-x86_64:
   # Build GLFW for Wayland
   - mkdir build_wayland
   - cd build_wayland
-  - PKG_CONFIG_PATH=/usr/local/share/pkgconfig ../cmake/bin/cmake ../glfw-${GLFW_VERSION} -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DGLFW_USE_WAYLAND=ON
+  - PKG_CONFIG_PATH=/usr/local/share/pkgconfig ../cmake/bin/cmake ../glfw-${GLFW_VERSION} -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DGLFW_BUILD_X11=OFF -DGLFW_BUILD_WAYLAND=ON
   - make
   - mkdir -p ../artifacts-manylinux2014-x86_64/wayland
   - cp src/libglfw.so ../artifacts-manylinux2014-x86_64/wayland/libglfw.so
@@ -52,16 +136,18 @@ build-manylinux2014-aarch64:
   # Download GLFW from source
   - curl -LO https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.zip
   - unzip glfw-${GLFW_VERSION}.zip
+  # Patch GLFW 3.4 to be compatible with manylinux2014
+  - patch -p0 -i Willy-JL-glfw-3.4.0-patch.diff
   # Install cmake
-  - curl -LO https://github.com/Kitware/CMake/releases/download/v3.21.2/cmake-3.21.2-linux-aarch64.tar.gz
-  - tar xzf cmake-3.21.2-linux-aarch64.tar.gz
-  - mv cmake-3.21.2-linux-aarch64 cmake
+  - curl -LO https://github.com/Kitware/CMake/releases/download/v3.28.3/cmake-3.28.3-linux-aarch64.tar.gz
+  - tar xzf cmake-3.28.3-linux-aarch64.tar.gz
+  - mv cmake-3.28.3-linux-aarch64 cmake
   # Install build dependencies for X11
   - yum install -y libXinerama-devel libXrandr-devel libXcursor-devel libXi-devel
   # Build GLFW for X11
   - mkdir build_x11
   - cd build_x11
-  - ../cmake/bin/cmake ../glfw-${GLFW_VERSION} -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF
+  - ../cmake/bin/cmake ../glfw-${GLFW_VERSION} -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF  -DGLFW_BUILD_X11=ON -DGLFW_BUILD_WAYLAND=OFF
   - make
   - mkdir -p ../artifacts-manylinux2014-aarch64/x11
   - cp src/libglfw.so ../artifacts-manylinux2014-aarch64/x11/libglfw.so
@@ -78,60 +164,13 @@ build-manylinux2014-aarch64:
   # Build GLFW for Wayland
   - mkdir build_wayland
   - cd build_wayland
-  - PKG_CONFIG_PATH=/usr/local/share/pkgconfig ../cmake/bin/cmake ../glfw-${GLFW_VERSION} -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DGLFW_USE_WAYLAND=ON
+  - PKG_CONFIG_PATH=/usr/local/share/pkgconfig ../cmake/bin/cmake ../glfw-${GLFW_VERSION} -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DGLFW_BUILD_X11=OFF -DGLFW_BUILD_WAYLAND=ON
   - make
   - mkdir -p ../artifacts-manylinux2014-aarch64/wayland
   - cp src/libglfw.so ../artifacts-manylinux2014-aarch64/wayland/libglfw.so
   artifacts:
     paths:
     - artifacts-manylinux2014-aarch64
-
-build-manylinux2010-x86_64:
-  stage: build
-  image: quay.io/pypa/manylinux2010_x86_64
-  script:
-  # Download GLFW from source
-  - curl -LO https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.zip
-  - unzip glfw-${GLFW_VERSION}.zip
-  # Install build dependencies
-  - yum install -y libXinerama-devel libXrandr-devel libXcursor-devel libXi-devel
-  - curl -LO https://github.com/Kitware/CMake/releases/download/v3.1.3/cmake-3.1.3-Linux-x86_64.tar.gz
-  - tar xzf cmake-3.1.3-Linux-x86_64.tar.gz
-  - mv cmake-3.1.3-Linux-x86_64 cmake
-  # Build GLFW
-  - mkdir build
-  - cd build
-  - ../cmake/bin/cmake ../glfw-${GLFW_VERSION} -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF
-  - make
-  - mkdir ../artifacts-manylinux2010-x86_64
-  - cp src/libglfw.so ../artifacts-manylinux2010-x86_64/libglfw.so
-  artifacts:
-    paths:
-    - artifacts-manylinux2010-x86_64
-
-build-manylinux2010-i686:
-  stage: build
-  image: quay.io/pypa/manylinux2010_i686
-  script:
-  # Download GLFW from source
-  - curl -LO https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.zip
-  - unzip glfw-${GLFW_VERSION}.zip
-  # Install build dependencies
-  - yum install -y libXinerama-devel libXrandr-devel libXcursor-devel libXi-devel ncompress
-  - curl -LO https://github.com/Kitware/CMake/releases/download/v3.1.3/cmake-3.1.3-Linux-i386.tar.Z
-  - uncompress cmake-3.1.3-Linux-i386.tar.Z
-  - tar xf cmake-3.1.3-Linux-i386.tar
-  - mv cmake-3.1.3-Linux-i386 cmake
-  # Build GLFW
-  - mkdir build
-  - cd build
-  - ../cmake/bin/cmake ../glfw-${GLFW_VERSION} -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF
-  - make
-  - mkdir ../artifacts-manylinux2010-i686
-  - cp src/libglfw.so ../artifacts-manylinux2010-i686/libglfw.so
-  artifacts:
-    paths:
-    - artifacts-manylinux2010-i686
 
 packages:
   stage: package
@@ -144,48 +183,54 @@ packages:
   # Build wheel for Windows x86
   - curl -L -o glfw.bin.zip https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.bin.WIN32.zip
   - unzip glfw.bin.zip -d glfw.bin
-  - cp glfw.bin/*/lib-vc2010/glfw3.dll glfw/glfw3.dll
-  - cp vcredist/msvcr100.dll glfw/msvcr100.dll
-  - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38 --plat-name win32
-  - rm -rf glfw.bin.zip glfw.bin glfw/glfw3.dll glfw/msvcr100.dll build
+  - cp glfw.bin/*/lib-vc2013/glfw3.dll glfw/glfw3.dll
+  - cp vcredist/msvcr120.dll glfw/msvcr120.dll
+  - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38.p39.p310.p311.p312.p313 --plat-name win32
+  - rm -rf glfw.bin.zip glfw.bin glfw/glfw3.dll glfw/msvcr120.dll build
   # Build wheel for Windows x86_64
   - curl -L -o glfw.bin.zip https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.bin.WIN64.zip
   - unzip glfw.bin.zip -d glfw.bin
-  - cp glfw.bin/*/lib-vc2012/glfw3.dll glfw/glfw3.dll
-  - cp vcredist/msvcr110.dll glfw/msvcr110.dll
-  - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38 --plat-name win_amd64
-  - rm -rf glfw.bin.zip glfw.bin glfw/glfw3.dll glfw/msvcr110.dll build
+  - cp glfw.bin/*/lib-vc2013/glfw3.dll glfw/glfw3.dll
+  - cp vcredist/msvcr120.dll glfw/msvcr120.dll
+  - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38.p39.p310.p311.p312.p313 --plat-name win_amd64
+  - rm -rf glfw.bin.zip glfw.bin glfw/glfw3.dll glfw/msvcr120.dll build
   # Build wheel for macOS x86_64
   - curl -L -o glfw.bin.zip https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.bin.MACOS.zip
   - unzip glfw.bin.zip -d glfw.bin
   - cp glfw.bin/*/lib-x86_64/libglfw.3.dylib glfw/libglfw.3.dylib
-  - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38 --plat-name macosx_10.6_intel
+  - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38.p39.p310.p311.p312.p313 --plat-name macosx_10.6_intel
   - rm -rf glfw/libglfw.3.dylib build
   # Build wheel for macOS arm64
   - cp glfw.bin/*/lib-arm64/libglfw.3.dylib glfw/libglfw.3.dylib
-  - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38 --plat-name macosx_11.0_arm64
+  - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38.p39.p310.p311.p312.p313 --plat-name macosx_11.0_arm64
   - rm -rf glfw.bin.zip glfw.bin glfw/libglfw.3.dylib build
-  # Build wheel for manylinux2010 x86
-  - cp artifacts-manylinux2010-i686/libglfw.so glfw/libglfw.so
-  - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38 --plat-name manylinux2010_i686
-  - rm -rf glfw/libglfw.so build
-  # Build wheel for manylinux2010 x86_64
-  - cp artifacts-manylinux2010-x86_64/libglfw.so glfw/libglfw.so
-  - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38 --plat-name manylinux2010_x86_64
-  - rm -rf glfw/libglfw.so build
   # Build wheel for manylinux2014 x86_64
-  - mkdir glfw/x11/
+  - mkdir -p glfw/x11/
   - cp artifacts-manylinux2014-x86_64/x11/libglfw.so glfw/x11/libglfw.so
-  - mkdir glfw/wayland/
+  - mkdir -p glfw/wayland/
   - cp artifacts-manylinux2014-x86_64/wayland/libglfw.so glfw/wayland/libglfw.so
-  - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38 --plat-name manylinux2014_x86_64
+  - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38.p39.p310.p311.p312.p313 --plat-name manylinux2014_x86_64
   - rm -rf glfw/x11/libglfw.so glfw/wayland/libglfw.so build
   # Build wheel for manylinux2014 aarch64
   - mkdir -p glfw/x11/
   - cp artifacts-manylinux2014-aarch64/x11/libglfw.so glfw/x11/libglfw.so
   - mkdir -p glfw/wayland/
   - cp artifacts-manylinux2014-aarch64/wayland/libglfw.so glfw/wayland/libglfw.so
-  - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38 --plat-name manylinux2014_aarch64
+  - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38.p39.p310.p311.p312.p313 --plat-name manylinux2014_aarch64
+  - rm -rf glfw/x11/libglfw.so glfw/wayland/libglfw.so build
+  # Build wheel for manylinux_2_28 x86_64
+  - mkdir -p glfw/x11/
+  - cp artifacts-manylinux_2_28-x86_64/x11/libglfw.so glfw/x11/libglfw.so
+  - mkdir -p glfw/wayland/
+  - cp artifacts-manylinux_2_28-x86_64/wayland/libglfw.so glfw/wayland/libglfw.so
+  - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38.p39.p310.p311.p312.p313 --plat-name manylinux_2_28_x86_64
+  - rm -rf glfw/x11/libglfw.so glfw/wayland/libglfw.so build
+  # Build wheel for manylinux_2_28 aarch64
+  - mkdir -p glfw/x11/
+  - cp artifacts-manylinux_2_28-aarch64/x11/libglfw.so glfw/x11/libglfw.so
+  - mkdir -p glfw/wayland/
+  - cp artifacts-manylinux_2_28-aarch64/wayland/libglfw.so glfw/wayland/libglfw.so
+  - python3 setup.py bdist_wheel --python-tag py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38.p39.p310.p311.p312.p313 --plat-name manylinux_2_28_aarch64
   - rm -rf glfw/x11/libglfw.so glfw/wayland/libglfw.so build
   # Build source distribution for glfw_preview helper package
   - cd utils/glfw_preview

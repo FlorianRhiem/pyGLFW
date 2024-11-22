@@ -35,8 +35,7 @@ setup(
             'wayland/libglfw.so',
             'x11/libglfw.so',
             'libglfw.so',
-            'msvcr100.dll',
-            'msvcr110.dll',
+            'msvcr120.dll',
         ]
     },
     extras_require={
