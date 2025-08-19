@@ -1,34 +1,35 @@
 import ctypes
 from _typeshed import Incomplete
 from typing import NamedTuple
+from cffi import FFI
 
 __version__: str
 ERROR_REPORTING: str
 NORMALIZE_GAMMA_RAMPS: bool
-ffi: Incomplete
+ffi: FFI
 
 class GLFWError(UserWarning):
-    error_code: Incomplete
-    def __init__(self, message, error_code=None) -> None: ...
+    error_code: int
+    def __init__(self, message: str, error_code: int | None = None) -> None: ...
 
 class _GLFWwindow(ctypes.Structure): ...
 class _GLFWmonitor(ctypes.Structure): ...
 
 class _GLFWvidmode(ctypes.Structure):
-
     class GLFWvidmode(NamedTuple):
-        size: Incomplete
-        bits: Incomplete
-        refresh_rate: Incomplete
+        size: _GLFWvidmode.Size
+        bits: _GLFWvidmode.Bits
+        refresh_rate: int
 
     class Size(NamedTuple):
-        width: Incomplete
-        height: Incomplete
+        width: int
+        height: int
 
     class Bits(NamedTuple):
-        red: Incomplete
-        green: Incomplete
-        blue: Incomplete
+        red: int
+        green: int
+        blue: int
+
     width: int
     height: int
     red_bits: int
@@ -36,15 +37,15 @@ class _GLFWvidmode(ctypes.Structure):
     blue_bits: int
     refresh_rate: int
     def __init__(self) -> None: ...
-    def wrap(self, video_mode) -> None: ...
-    def unwrap(self): ...
+    def wrap(self, video_mode: GLFWvidmode) -> None: ...
+    def unwrap(self) -> GLFWvidmode: ...
 
 class _GLFWgammaramp(ctypes.Structure):
-
     class GLFWgammaramp(NamedTuple):
         red: Incomplete
         green: Incomplete
         blue: Incomplete
+
     red: Incomplete
     red_array: Incomplete
     green: Incomplete
@@ -59,11 +60,11 @@ class _GLFWgammaramp(ctypes.Structure):
 class _GLFWcursor(ctypes.Structure): ...
 
 class _GLFWimage(ctypes.Structure):
-
     class GLFWimage(NamedTuple):
         width: Incomplete
         height: Incomplete
         pixels: Incomplete
+
     width: int
     height: int
     pixels: Incomplete
@@ -73,10 +74,10 @@ class _GLFWimage(ctypes.Structure):
     def unwrap(self): ...
 
 class _GLFWgamepadstate(ctypes.Structure):
-
     class GLFWgamepadstate(NamedTuple):
         buttons: Incomplete
         axes: Incomplete
+
     buttons: Incomplete
     axes: Incomplete
     def __init__(self) -> None: ...
@@ -530,12 +531,16 @@ def create_window_surface(instance, window, allocator, surface): ...
 def get_physical_device_presentation_support(instance, device, queuefamily): ...
 def get_instance_proc_address(instance, procname): ...
 def set_window_icon(window, count, images) -> None: ...
-def set_window_size_limits(window, minwidth, minheight, maxwidth, maxheight) -> None: ...
+def set_window_size_limits(
+    window, minwidth, minheight, maxwidth, maxheight
+) -> None: ...
 def set_window_aspect_ratio(window, numer, denom) -> None: ...
 def get_window_frame_size(window): ...
 def maximize_window(window) -> None: ...
 def focus_window(window) -> None: ...
-def set_window_monitor(window, monitor, xpos, ypos, width, height, refresh_rate) -> None: ...
+def set_window_monitor(
+    window, monitor, xpos, ypos, width, height, refresh_rate
+) -> None: ...
 def wait_events_timeout(timeout) -> None: ...
 def post_empty_event() -> None: ...
 def get_win32_adapter(monitor): ...
