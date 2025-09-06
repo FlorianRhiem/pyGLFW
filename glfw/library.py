@@ -227,7 +227,7 @@ def _get_package_path_variant(package_path):
 
 if os.environ.get('PYGLFW_LIBRARY', ''):
     try:
-        glfw = ctypes.CDLL(os.environ['PYGLFW_LIBRARY'])
+        glfw = ctypes.CDLL(os.environ['PYGLFW_LIBRARY'])  # type: ctypes.CDLL | None
     except OSError:
         glfw = None
 elif sys.platform == 'win32':

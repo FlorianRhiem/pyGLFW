@@ -1,6 +1,6 @@
 """ Automatically generated C-style module for pyGLFW """
+from .library import glfw as _glfw
 from . import (
-    _glfw,
     ACCUM_ALPHA_BITS as GLFW_ACCUM_ALPHA_BITS,
     ACCUM_BLUE_BITS as GLFW_ACCUM_BLUE_BITS,
     ACCUM_GREEN_BITS as GLFW_ACCUM_GREEN_BITS,

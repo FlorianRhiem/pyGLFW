@@ -2,8 +2,33 @@ variables:
     GLFW_VERSION: "3.4"
 
 stages:
+- analyze
 - build
 - package
+
+analyze-stubs:
+  stage: analyze
+  image: python:3.13-slim-trixie
+  script:
+  # Install GLFW dependencies
+  - apt-get update -qy
+  - apt-get install -y curl unzip cmake libwayland-dev libxkbcommon-dev xorg-dev
+  # Download GLFW from source
+  - curl -LO https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.zip
+  - unzip glfw-${GLFW_VERSION}.zip
+  # Build GLFW for Wayland
+  - mkdir build
+  - cd build
+  - PKG_CONFIG_PATH=/usr/local/share/pkgconfig cmake ../glfw-${GLFW_VERSION} -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DGLFW_BUILD_X11=OFF -DGLFW_BUILD_WAYLAND=ON
+  - make
+  - cd ..
+  - ls `pwd`/build/src/
+  # Set up mypy
+  - python -m pip install mypy types-cffi
+  # Test the stubs, ignoring some errors from win32 and wgl functions, as those will not be present in the tested runtime
+  - PYGLFW_LIBRARY=`pwd`/build/src/libglfw.so PYGLFW_PREVIEW=1 python3 -m mypy.stubtest glfw > mypy_output.txt || true
+  - cat mypy_output.txt
+  - cat mypy_output.txt | grep -Ev "(win32|wgl|x11|cocoa|glx|nsgl|glfw.ffi).*is not present at runtime" | grep -v "errors" | grep -vq "error"
 
 build-manylinux_2_28-x86_64:
   stage: build
