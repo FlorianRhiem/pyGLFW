@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [2.10.0] - 2025-09-12
+- Added type stubs
+
 ## [2.9.0] - 2025-04-15
 - Added library search paths for various architectures
 
