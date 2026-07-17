@@ -35,7 +35,9 @@ setup(
             'wayland/libglfw.so',
             'x11/libglfw.so',
             'libglfw.so',
-            'msvcr120.dll',
+            'msvcr120.dll',            
+            '__init__.pyi',
+            'py.typed',
         ]
     },
     extras_require={
