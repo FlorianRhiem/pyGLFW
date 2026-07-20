@@ -2,6 +2,7 @@ from _typeshed import Incomplete
 from collections.abc import Callable, Sequence
 import ctypes
 from typing import NamedTuple, Optional
+from typing_extensions import TypeAlias
 from cffi import FFI
 
 __version__: str
@@ -426,9 +427,9 @@ DONT_CARE: int
 UNLIMITED_MOUSE_BUTTONS: int
 
 
-type _GLFWallocatefunT = Callable[[ctypes.c_size_t, ctypes.c_void_p], ctypes.c_void_p]
-type _GLFWreallocatefunT = Callable[[ctypes.c_void_p, ctypes.c_size_t, ctypes.c_void_p], ctypes.c_void_p]
-type _GLFWdeallocatefunT = Callable[[None, ctypes.c_void_p, ctypes.c_void_p], ctypes.c_void_p]
+_GLFWallocatefunT: TypeAlias = Callable[[ctypes.c_size_t, ctypes.c_void_p], ctypes.c_void_p]
+_GLFWreallocatefunT: TypeAlias = Callable[[ctypes.c_void_p, ctypes.c_size_t, ctypes.c_void_p], ctypes.c_void_p]
+_GLFWdeallocatefunT: TypeAlias = Callable[[None, ctypes.c_void_p, ctypes.c_void_p], ctypes.c_void_p]
 
 class _GLFWallocator(ctypes.Structure):
     allocate: _GLFWallocatefunT
@@ -437,38 +438,38 @@ class _GLFWallocator(ctypes.Structure):
 
 ### Custom types used for type checking only
 # Types copied to global namespace
-type _GLFWvidmodeT = _GLFWvidmode.GLFWvidmode
-type _GLFWgammarampT = _GLFWgammaramp.GLFWgammaramp
-type _GLFWimageT = _GLFWimage.GLFWimage
-type _GLFWgamepadstateT = _GLFWgamepadstate.GLFWgamepadstate
+_GLFWvidmodeT: TypeAlias = _GLFWvidmode.GLFWvidmode
+_GLFWgammarampT: TypeAlias = _GLFWgammaramp.GLFWgammaramp
+_GLFWimageT: TypeAlias = _GLFWimage.GLFWimage
+_GLFWgamepadstateT: TypeAlias = _GLFWgamepadstate.GLFWgamepadstate
 
-type _GLFWmonitorPointerT = ctypes._Pointer[_GLFWmonitor]
-type _GLFWwindowPointerT = ctypes._Pointer[_GLFWwindow]
-type _GLFWcursorPointerT = ctypes._Pointer[_GLFWcursor]
+_GLFWmonitorPointerT: TypeAlias = ctypes._Pointer[_GLFWmonitor]
+_GLFWwindowPointerT: TypeAlias = ctypes._Pointer[_GLFWwindow]
+_GLFWcursorPointerT: TypeAlias = ctypes._Pointer[_GLFWcursor]
 
-type _GLFWglprocT = ctypes.c_void_p
+_GLFWglprocT: TypeAlias = ctypes.c_void_p
 
-type _GLFWerrorfunT = Callable[[int, str], None]
-type _GLFWwindowposfunT = Callable[[_GLFWwindowPointerT, int, int], None]
-type _GLFWwindowsizefunT = Callable[[_GLFWwindowPointerT, int, int], None]
-type _GLFWwindowclosefunT = Callable[[_GLFWwindowPointerT], None]
-type _GLFWwindowrefreshfunT = Callable[[_GLFWwindowPointerT], None]
-type _GLFWwindowfocusfunT = Callable[[_GLFWwindowPointerT, int], None]
-type _GLFWwindowiconifyfunT = Callable[[_GLFWwindowPointerT, int], None]
-type _GLFWwindowmaximizefunT = Callable[[_GLFWwindowPointerT, int], None]
-type _GLFWframebuffersizefunT = Callable[[_GLFWwindowPointerT, int, int], None]
-type _GLFWwindowcontentscalefunT = Callable[[_GLFWwindowPointerT, float, float], None]
+_GLFWerrorfunT: TypeAlias = Callable[[int, str], None]
+_GLFWwindowposfunT: TypeAlias = Callable[[_GLFWwindowPointerT, int, int], None]
+_GLFWwindowsizefunT: TypeAlias = Callable[[_GLFWwindowPointerT, int, int], None]
+_GLFWwindowclosefunT: TypeAlias = Callable[[_GLFWwindowPointerT], None]
+_GLFWwindowrefreshfunT: TypeAlias = Callable[[_GLFWwindowPointerT], None]
+_GLFWwindowfocusfunT: TypeAlias = Callable[[_GLFWwindowPointerT, int], None]
+_GLFWwindowiconifyfunT: TypeAlias = Callable[[_GLFWwindowPointerT, int], None]
+_GLFWwindowmaximizefunT: TypeAlias = Callable[[_GLFWwindowPointerT, int], None]
+_GLFWframebuffersizefunT: TypeAlias = Callable[[_GLFWwindowPointerT, int, int], None]
+_GLFWwindowcontentscalefunT: TypeAlias = Callable[[_GLFWwindowPointerT, float, float], None]
 
-type _GLFWmousebuttonfunT = Callable[[_GLFWwindowPointerT, int, int, int], None]
-type _GLFWcursorposfunT = Callable[[_GLFWwindowPointerT, float, float], None]
-type _GLFWcursorenterfunT = Callable[[_GLFWwindowPointerT, int], None]
-type _GLFWscrollfunT = Callable[[_GLFWwindowPointerT, float, float], None]
-type _GLFWkeyfunT = Callable[[_GLFWwindowPointerT, int, int, int, int], None]
-type _GLFWcharfunT = Callable[[_GLFWwindowPointerT, int], None]
-type _GLFWmonitorfunT = Callable[[_GLFWmonitorPointerT, int], None]
-type _GLFWdropfunT = Callable[[_GLFWwindowPointerT, int, str], None]
-type _GLFWcharmodsfunT = Callable[[_GLFWwindowPointerT, int, int], None]
-type _GLFWjoystickfunT = Callable[[int, int], None]
+_GLFWmousebuttonfunT: TypeAlias = Callable[[_GLFWwindowPointerT, int, int, int], None]
+_GLFWcursorposfunT: TypeAlias = Callable[[_GLFWwindowPointerT, float, float], None]
+_GLFWcursorenterfunT: TypeAlias = Callable[[_GLFWwindowPointerT, int], None]
+_GLFWscrollfunT: TypeAlias = Callable[[_GLFWwindowPointerT, float, float], None]
+_GLFWkeyfunT: TypeAlias = Callable[[_GLFWwindowPointerT, int, int, int, int], None]
+_GLFWcharfunT: TypeAlias = Callable[[_GLFWwindowPointerT, int], None]
+_GLFWmonitorfunT: TypeAlias = Callable[[_GLFWmonitorPointerT, int], None]
+_GLFWdropfunT: TypeAlias = Callable[[_GLFWwindowPointerT, int, str], None]
+_GLFWcharmodsfunT: TypeAlias = Callable[[_GLFWwindowPointerT, int, int], None]
+_GLFWjoystickfunT: TypeAlias = Callable[[int, int], None]
 ### End of custom types
 
 def init() -> int: ...
