@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [2.10.2] - 2026-07-21
+- Improve Python version compatibility of type hints
+
 ## [2.10.1] - 2026-07-17
 - Include type stubs in package
 
