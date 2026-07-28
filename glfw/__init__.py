@@ -19,11 +19,11 @@ __version__ = '2.10.2'
 # - Log on debug level using the 'glfw' logger, if ERROR_REPORTING is 'log'.
 # - Ignore the GLFWError, if ERROR_REPORTING is 'ignore' or False.
 # If ERROR_REPORTING is a dict containing the specific error code or None as a
-# key, the corresponding value will be used.
+# key, the corresponding value will be used.
 # Alternatively, you can set a custom error callback using set_error_callback.
 ERROR_REPORTING = 'warn'
 
-# By default (NORMALIZE_GAMMA_RAMPS = True), gamma ramps are expected to
+# By default, (NORMALIZE_GAMMA_RAMPS = True) gamma ramps are expected to
 # contain values between 0 and 1, and the conversion to unsigned shorts will
 # be performed internally. Set NORMALIZE_GAMMA_RAMPS to False if you want
 # to disable this behavior and use integral values between 0 and 65535.
@@ -31,9 +31,9 @@ NORMALIZE_GAMMA_RAMPS = True
 
 import collections
 import ctypes
-import logging
+from logging import getLogger
 import os
-import functools
+from functools import wraps
 import sys
 import warnings
 
@@ -46,7 +46,7 @@ if _glfw is None:
 # versions, as using the development version may lead to changing behavior or
 # missing functions. If the environment variable PYGLFW_PREVIEW is set or the
 # glfw_preview package can be imported, macros and functions from the current
-# developtment version of GLFW will be provided. Note that there will still be
+# development version of GLFW will be provided. Note that there will still be
 # a delay between them getting added to GLFW and being wrapped by pyGLFW, and
 # further delay until they are included in a pyGLFW release.
 _PREVIEW = os.environ.get('PYGLFW_PREVIEW')
@@ -73,6 +73,7 @@ else:
     def _reraise(exception, traceback):
         # wrapped in exec, as python 3 does not support this variant of raise
         exec("raise exception, None, traceback")
+_to_str = lambda char_p: char_p.decode("utf-8")
 
 # support for CFFI pointers for Vulkan objects
 try:
@@ -659,7 +660,7 @@ if _PREVIEW:
 
 _exc_info_from_callback = None
 def _callback_exception_decorator(func):
-    @functools.wraps(func)
+    @wraps(func)
     def callback_wrapper(*args, **kwargs):
         global _exc_info_from_callback
         if _exc_info_from_callback is not None:
@@ -875,7 +876,7 @@ def get_version_string():
     Wrapper for:
         const char* glfwGetVersionString(void);
     """
-    return _glfw.glfwGetVersionString()
+    return _to_str(_glfw.glfwGetVersionString())
 
 
 if hasattr(_glfw, 'glfwGetError'):
@@ -916,7 +917,7 @@ def _handle_glfw_errors(error_code, description):
     elif error_reporting in ('warn', 'warning'):
         warnings.warn(message, GLFWError)
     elif error_reporting in ('log',):
-        logging.getLogger('glfw').debug(message)
+        getLogger('glfw').debug(message)
     elif error_reporting in ('ignore', False):
         pass
     else:
@@ -1072,7 +1073,7 @@ def get_monitor_name(monitor):
     Wrapper for:
         const char* glfwGetMonitorName(GLFWmonitor* monitor);
     """
-    return _glfw.glfwGetMonitorName(monitor)
+    return _to_str(_glfw.glfwGetMonitorName(monitor))
 
 
 if hasattr(_glfw, 'glfwSetMonitorUserPointer') and hasattr(_glfw, 'glfwGetMonitorUserPointer'):
@@ -2202,7 +2203,7 @@ def get_joystick_name(joy):
     Wrapper for:
         const char* glfwGetJoystickName(int joy);
     """
-    return _glfw.glfwGetJoystickName(joy)
+    return _to_str(_glfw.glfwGetJoystickName(joy))
 
 
 if hasattr(_glfw, 'glfwGetJoystickGUID'):
@@ -2215,7 +2216,7 @@ if hasattr(_glfw, 'glfwGetJoystickGUID'):
         Wrapper for:
             const char* glfwGetJoystickGUID(int jid);
         """
-        return _glfw.glfwGetJoystickGUID(joystick_id)
+        return _to_str(_glfw.glfwGetJoystickGUID(joystick_id))
 
 if hasattr(_glfw, 'glfwSetJoystickUserPointer') and hasattr(_glfw, 'glfwGetJoystickUserPointer'):
     _joystick_user_data_repository = {}
@@ -2321,7 +2322,7 @@ def get_clipboard_string(window):
     """
     if window is not None:
         warnings.warn("The window parameter to glfwSetClipboardString is deprecated", DeprecationWarning, stacklevel=2)
-    return _glfw.glfwGetClipboardString(window)
+    return _to_str(_glfw.glfwGetClipboardString(window))
 
 _glfw.glfwGetTime.restype = ctypes.c_double
 _glfw.glfwGetTime.argtypes = []
@@ -2577,7 +2578,7 @@ if hasattr(_glfw, 'glfwGetGamepadName'):
         """
         gamepad_name = _glfw.glfwGetGamepadName(joystick_id)
         if gamepad_name:
-            return gamepad_name.decode('utf-8')
+            return _to_str(gamepad_name)
         return None
 
 
@@ -2593,7 +2594,7 @@ if hasattr(_glfw, 'glfwGetKeyName'):
         """
         key_name = _glfw.glfwGetKeyName(key, scancode)
         if key_name:
-            return key_name.decode('utf-8')
+            return _to_str(key_name)
         return None
 
 
@@ -2871,7 +2872,7 @@ if hasattr(_glfw, 'glfwGetWin32Adapter'):
         """
         adapter_name = _glfw.glfwGetWin32Adapter(monitor)
         if adapter_name:
-            return adapter_name.decode('utf-8')
+            return _to_str(adapter_name)
         return None
 
 
@@ -2887,7 +2888,7 @@ if hasattr(_glfw, 'glfwGetWin32Monitor'):
         """
         monitor_name = _glfw.glfwGetWin32Monitor(monitor)
         if monitor_name:
-            return monitor_name.decode('utf-8')
+            return _to_str(monitor_name)
         return None
 
 
@@ -3034,7 +3035,7 @@ if hasattr(_glfw, 'glfwGetX11SelectionString'):
         """
         selection_string = _glfw.glfwGetX11SelectionString()
         if selection_string:
-            return selection_string.decode('utf-8')
+            return _to_str(selection_string)
         return None
 
 
@@ -3295,7 +3296,7 @@ if hasattr(_glfw, 'glfwGetWindowTitle'):
         """
         window_title = _glfw.glfwGetWindowTitle(window)
         if window_title:
-            return window_title.decode('utf-8')
+            return _to_str(window_title)
         return None
 
 
