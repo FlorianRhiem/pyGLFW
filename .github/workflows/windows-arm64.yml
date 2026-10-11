@@ -1,0 +1,53 @@
+name: Windows ARM64 wheel
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+    tags: ['*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  wheel:
+    runs-on: windows-11-arm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          architecture: arm64
+      - name: Check out GLFW 3.4
+        uses: actions/checkout@v4
+        with:
+          repository: glfw/glfw
+          ref: 7b6aead9fb88b3623e3b3725ebb42670cbe4c579
+          path: glfw-source
+      - name: Build native GLFW with the static C runtime
+        run: |
+          cmake -S glfw-source -B glfw-build -A ARM64 -DBUILD_SHARED_LIBS=ON -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF -DUSE_MSVC_RUNTIME_LIBRARY_DLL=OFF
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build glfw-build --config Release --parallel 2
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Copy-Item glfw-build/src/Release/glfw3.dll glfw/glfw3.dll
+      - name: Package wheel
+        run: |
+          python -m pip install setuptools wheel
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python setup.py bdist_wheel --python-tag py3 --plat-name win_arm64
+      - name: Test installed wheel without a library override
+        run: |
+          python -m venv wheel-test
+          $python = (Resolve-Path wheel-test/Scripts/python.exe).Path
+          & $python -m pip install (Get-ChildItem dist/*.whl).FullName
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          # Leave the source tree so the import comes from the wheel.
+          Copy-Item tests/check_windows_arm64.py $env:RUNNER_TEMP/check_windows_arm64.py
+          Set-Location $env:RUNNER_TEMP
+          & $python check_windows_arm64.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: glfw-win-arm64
+          path: dist/*.whl

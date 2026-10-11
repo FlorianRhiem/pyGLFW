@@ -242,8 +242,12 @@ elif sys.platform == 'win32':
     # try package directory
     if glfw is None:
         try:
-            # load Microsoft Visual C++ 2013 runtime
+            # Older Windows wheels bundle the Visual C++ 2013 runtime.
+            # Source-built DLLs can use a different or statically linked runtime.
             msvcr = ctypes.CDLL(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'msvcr120.dll'))
+        except OSError:
+            pass
+        try:
             glfw = ctypes.CDLL(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'glfw3.dll'))
         except OSError:
             pass

@@ -2,6 +2,7 @@
 .*
 !.gitignore
 !.gitlab-ci.yml
+!.github/
 *.dll
 *.dylib
 !vcredist/*.dll
