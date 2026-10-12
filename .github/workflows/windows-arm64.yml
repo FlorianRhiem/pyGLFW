@@ -37,6 +37,31 @@ jobs:
           python -m pip install setuptools wheel
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python setup.py bdist_wheel --python-tag py3 --plat-name win_arm64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: glfw-win-arm64
+          path: dist/*.whl
+          if-no-files-found: error
+
+  test:
+    needs: wheel
+    runs-on: windows-11-arm
+    strategy:
+      fail-fast: false
+      matrix:
+        # The wheel is not tied to a Python version, so test it on every
+        # CPython release with a native Windows ARM64 build.
+        python-version: ['3.11', '3.12', '3.13', '3.14', '3.15']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: arm64
+      - uses: actions/download-artifact@v4
+        with:
+          name: glfw-win-arm64
+          path: dist
       - name: Test installed wheel without a library override
         run: |
           python -m venv wheel-test
@@ -47,7 +72,4 @@ jobs:
           Copy-Item tests/check_windows_arm64.py $env:RUNNER_TEMP/check_windows_arm64.py
           Set-Location $env:RUNNER_TEMP
           & $python check_windows_arm64.py
-      - uses: actions/upload-artifact@v4
-        with:
-          name: glfw-win-arm64
-          path: dist/*.whl
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
