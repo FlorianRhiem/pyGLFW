@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 For information on changes in GLFW itself, see the [GLFW version history](https://www.glfw.org/changelog.html).
 
+## [2.11.0] - 2026-10-16
+- Improve library loading on Windows
+- Build Windows ARM64 wheels using GitHub actions
+
 ## [2.10.2] - 2026-07-21
 - Improve Python version compatibility of type hints
 
